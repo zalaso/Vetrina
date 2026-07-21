@@ -177,7 +177,40 @@ Nota: il polling locale sospende il webhook; quando hai finito, ripristinalo con
 
 ---
 
-## 9. Struttura del repository
+## 9. Se il sito non si aggiorna
+
+Se pubblichi un oggetto dal bot e sul sito non compare, controlla in quest'ordine:
+
+1. **L'oggetto è su Airtable con Stato "Disponibile"?** Se no, il problema è nel bot.
+2. **Su Vercel, progetto del sito → Deployments: ci sono build recenti e sono verdi?**
+   - Build **Error** → apri il registro e leggi il motivo.
+   - **Nessuna build** dopo una modifica → il deploy non è stato nemmeno avviato: vedi il punto 3.
+3. **Deployment bloccati con il messaggio *"the commit author did not have contributing access"***.
+   Succede quando l'autore dei commit non corrisponde all'account Vercel. Sul piano
+   gratuito Vercel rifiuta i commit di un utente diverso dal proprietario su
+   repository privati.
+
+   Questo repository è impostato per usare l'identità dell'account **zalaso**:
+
+   ```bash
+   git config user.name   # zalaso
+   git config user.email  # 255437588+zalaso@users.noreply.github.com
+   ```
+
+   Se hai clonato il progetto su un altro computer, ripeti quei due comandi con
+   `git config user.name "zalaso"` e
+   `git config user.email "255437588+zalaso@users.noreply.github.com"`,
+   altrimenti Git userebbe l'indirizzo globale (`guidomarmorini@gmail.com`), che
+   GitHub associa a un account diverso e Vercel rifiuta.
+
+   Per lo stesso motivo, **non aggiungere righe `Co-Authored-By:` ai commit**: Vercel
+   le legge come un secondo contributore e blocca la pubblicazione.
+
+4. **Il deploy hook punta al progetto giusto?** L'URL contiene l'identificativo del
+   progetto (`.../deploy/prj_XXXX/...`): deve coincidere con il **Project ID** che
+   trovi in Settings → General del progetto del **sito**, non del bot.
+
+## 10. Struttura del repository
 
 ```
 ├── site/                    Sito vetrina (Astro)
