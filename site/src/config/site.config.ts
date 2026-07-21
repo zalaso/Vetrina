@@ -19,7 +19,11 @@ export const siteConfig = {
   /** Partita IVA */
   partitaIva: "00000000000",
 
-  /** Codice fiscale */
+  /**
+   * Codice fiscale — NON mostrato sul sito (per una ditta individuale
+   * la legge richiede solo la P.IVA nel footer). Tenuto qui a portata
+   * di mano per fatture e documenti.
+   */
   codiceFiscale: "[rimosso]",
 
   /**
