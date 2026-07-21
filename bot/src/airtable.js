@@ -90,8 +90,16 @@ export async function listaVendutiAnno(anno) {
 }
 
 /**
+ * Per quanti minuti una bozza resta "in lavorazione".
+ * Passato questo tempo il bot la considera abbandonata: una foto nuova
+ * apre un oggetto nuovo invece di attaccarsi a quello vecchio, e un
+ * messaggio di testo torna a essere un comando normale.
+ */
+export const MINUTI_BOZZA_ATTIVA = 30;
+
+/**
  * Trova la bozza "attiva" di una chat: l'ultimo record in Stato Bozza
- * creato da quella chat, se toccato negli ultimi 30 minuti.
+ * creato da quella chat, se creato da meno di MINUTI_BOZZA_ATTIVA.
  * È il modo in cui il bot ricorda a che punto era anche senza memoria.
  */
 export async function trovaBozzaAttiva(chatId) {
@@ -99,10 +107,18 @@ export async function trovaBozzaAttiva(chatId) {
     `AND({${F.stato}} = "Bozza", {${F.chat}} = "${chatId}")`
   );
   if (records.length === 0) return null;
-  records.sort((a, b) =>
-    (b.fields[F.dataInserimento] ?? "").localeCompare(a.fields[F.dataInserimento] ?? "")
+
+  // createdTime è preciso al secondo, a differenza di "Data inserimento"
+  // che ha solo il giorno e non permette di distinguere due bozze.
+  records.sort(
+    (a, b) => new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime()
   );
-  return records[0];
+
+  const recente = records[0];
+  const etaMinuti =
+    (Date.now() - new Date(recente.createdTime).getTime()) / 60000;
+
+  return etaMinuti <= MINUTI_BOZZA_ATTIVA ? recente : null;
 }
 
 /** Le foto sono salvate come testo, un URL per riga */
