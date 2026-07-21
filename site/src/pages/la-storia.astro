@@ -1,21 +1,29 @@
 ---
 import Base from "../layouts/Base.astro";
-import { siteConfig, whatsappLink } from "../config/site.config";
+import {
+  siteConfig,
+  whatsappLink,
+  compilato,
+  storiaCompilata,
+} from "../config/site.config";
 
 const { storia } = siteConfig;
 const fotoTitolare =
   storia.foto || "https://picsum.photos/seed/ritratto-antiquario/900/1100";
 
-/* Il segnaposto della citazione non va mostrato finché non è compilato */
-const citazione =
-  storia.citazione && !storia.citazione.startsWith("[DA COMPILARE")
-    ? storia.citazione
-    : "";
+/* Si mostra solo ciò che è stato davvero scritto, mai i segnaposti */
+const paragrafi = storiaCompilata();
+const citazione = compilato(storia.citazione) ? storia.citazione : "";
+
+/* Finché la biografia non c'è, la pagina resta fuori dai motori di ricerca
+   e dal menu (vedi Header.astro) */
+const incompleta = paragrafi.length === 0;
 ---
 
 <Base
   titolo="La storia"
   descrizione={`Chi è ${siteConfig.titolare}: la storia dell'antiquario dietro ${siteConfig.nomeAttivita}.`}
+  noindex={incompleta}
 >
   <section class="sezione">
     <div class="contenitore storia">
@@ -34,9 +42,18 @@ const citazione =
         <p class="storia__ruolo">{storia.sottotitolo}</p>
         <h1 class="storia__titolo">{storia.titolo}</h1>
 
-        {storia.paragrafi.map((paragrafo) => (
-          <p class="storia__paragrafo">{paragrafo}</p>
-        ))}
+        {
+          paragrafi.length > 0 ? (
+            paragrafi.map((paragrafo) => (
+              <p class="storia__paragrafo">{paragrafo}</p>
+            ))
+          ) : (
+            <p class="storia__paragrafo">
+              Il modo migliore per conoscere {siteConfig.titolare} è passare in
+              bottega: ogni pezzo che trovi qui l'ha scelto lui, uno per uno.
+            </p>
+          )
+        }
 
         {
           citazione && (

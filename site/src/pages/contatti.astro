@@ -1,18 +1,39 @@
 ---
 import Base from "../layouts/Base.astro";
-import { siteConfig, whatsappLink } from "../config/site.config";
+import {
+  siteConfig,
+  whatsappLink,
+  compilato,
+  orariCompilati,
+} from "../config/site.config";
+
+const mostraIndirizzo = compilato(siteConfig.indirizzo);
+const orari = orariCompilati();
+
+/**
+ * La mappa: se non è stato indicato un link di incorporamento ma l'indirizzo
+ * c'è, ne costruiamo uno da soli. Non serve nessuna chiave di Google.
+ */
+const mappaUrl = siteConfig.mappaEmbedUrl
+  ? siteConfig.mappaEmbedUrl
+  : mostraIndirizzo
+    ? `https://www.google.com/maps?q=${encodeURIComponent(siteConfig.indirizzo)}&output=embed`
+    : "";
 ---
 
 <Base
   titolo="Contatti"
-  descrizione="Dove trovarci, orari di apertura e contatti di HD Design."
+  descrizione={`Dove trovarci, orari di apertura e contatti di ${siteConfig.nomeAttivita}.`}
 >
   <section class="sezione">
     <div class="contenitore">
       <h1 class="titolo-sezione">Vieni a trovarci</h1>
       <p class="sottotitolo-sezione">
-        Il negozio è il posto migliore per vedere i pezzi dal vivo. Se
-        preferisci, scrivici o chiamaci: rispondiamo volentieri.
+        {
+          mostraIndirizzo
+            ? siteConfig.indirizzo
+            : "Il posto migliore per vedere i pezzi è dal vivo. Chiamaci o scrivici: ti diciamo volentieri dove siamo e quando passare."
+        }
       </p>
 
       <div class="colonne">
@@ -22,12 +43,16 @@ import { siteConfig, whatsappLink } from "../config/site.config";
             <span class="scheda-info__etichetta">Telefono</span>
             <a href={`tel:${siteConfig.telefono}`}>{siteConfig.telefonoVisibile}</a>
           </p>
-          <p class="scheda-info__voce">
-            <span class="scheda-info__etichetta">Indirizzo</span>
-            {siteConfig.indirizzo}
-          </p>
           {
-            siteConfig.email && (
+            mostraIndirizzo && (
+              <p class="scheda-info__voce">
+                <span class="scheda-info__etichetta">Indirizzo</span>
+                {siteConfig.indirizzo}
+              </p>
+            )
+          }
+          {
+            compilato(siteConfig.email) && (
               <p class="scheda-info__voce">
                 <span class="scheda-info__etichetta">Email</span>
                 <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
@@ -39,35 +64,33 @@ import { siteConfig, whatsappLink } from "../config/site.config";
           </a>
         </div>
 
-        <div class="scheda-info">
-          <h2 class="scheda-info__titolo">Orari di apertura</h2>
-          <ul class="orari">
-            {siteConfig.orari.map((riga) => <li>{riga}</li>)}
-          </ul>
-        </div>
+        {
+          orari.length > 0 && (
+            <div class="scheda-info">
+              <h2 class="scheda-info__titolo">Orari di apertura</h2>
+              <ul class="orari">
+                {orari.map((riga) => (
+                  <li>{riga}</li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
       </div>
 
-      <div class="mappa">
-        {
-          siteConfig.mappaEmbedUrl ? (
+      {
+        mappaUrl && (
+          <div class="mappa">
             <iframe
-              src={siteConfig.mappaEmbedUrl}
+              src={mappaUrl}
               title={`Mappa: come raggiungere ${siteConfig.nomeAttivita}`}
               loading="lazy"
               allowfullscreen
               referrerpolicy="no-referrer-when-downgrade"
             />
-          ) : (
-            <div class="mappa__segnaposto">
-              <p>
-                La mappa comparirà qui: inserisci il link di incorporamento di
-                Google Maps nel file di configurazione
-                (<code>site.config.ts</code>, campo <code>mappaEmbedUrl</code>).
-              </p>
-            </div>
-          )
-        }
-      </div>
+          </div>
+        )
+      }
     </div>
   </section>
 </Base>
@@ -78,6 +101,11 @@ import { siteConfig, whatsappLink } from "../config/site.config";
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  /* Se c'è una sola scheda non deve occupare tutta la larghezza */
+  .colonne:has(.scheda-info:only-child) {
+    grid-template-columns: minmax(0, 28rem);
   }
 
   .scheda-info {
@@ -135,15 +163,6 @@ import { siteConfig, whatsappLink } from "../config/site.config";
     border: 1px solid var(--linea);
     border-radius: var(--raggio);
     display: block;
-  }
-
-  .mappa__segnaposto {
-    background: var(--sfondo-scuro);
-    border: 1px dashed var(--grigio-chiaro);
-    border-radius: var(--raggio);
-    padding: 3rem 2rem;
-    text-align: center;
-    color: var(--grigio);
   }
 
   @media (max-width: 720px) {

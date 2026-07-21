@@ -1,8 +1,9 @@
 ---
 import Logo from "./Logo.astro";
-import { siteConfig } from "../config/site.config";
+import { siteConfig, compilato } from "../config/site.config";
 
 const anno = new Date().getFullYear();
+const mostraIndirizzo = compilato(siteConfig.indirizzo);
 ---
 
 <footer class="fondo">
@@ -13,7 +14,7 @@ const anno = new Date().getFullYear();
     </div>
     <div class="fondo__colonna">
       <p class="fondo__titolo">Contatti</p>
-      <p class="fondo__testo">{siteConfig.indirizzo}</p>
+      {mostraIndirizzo && <p class="fondo__testo">{siteConfig.indirizzo}</p>}
       <p class="fondo__testo">
         Tel. <a href={`tel:${siteConfig.telefono}`}>{siteConfig.telefonoVisibile}</a>
       </p>

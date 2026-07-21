@@ -13,12 +13,15 @@ interface Props {
   descrizione?: string;
   /** URL immagine per Open Graph (assoluto o relativo al sito) */
   ogImage?: string;
+  /** Pagina non ancora pronta: la si tiene fuori dai motori di ricerca */
+  noindex?: boolean;
 }
 
 const {
   titolo,
   descrizione = "HD Design: mobili, sedute, quadri e oggetti d'antiquariato scelti con cura. Vieni a trovarci in negozio o scrivici su WhatsApp.",
   ogImage,
+  noindex = false,
 } = Astro.props;
 
 const titoloCompleto = titolo
@@ -36,6 +39,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <title>{titoloCompleto}</title>
     <meta name="description" content={descrizione} />
     <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <meta name="generator" content={Astro.generator} />

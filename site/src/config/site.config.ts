@@ -86,6 +86,25 @@ export const siteConfig = {
   },
 } as const;
 
+/**
+ * Un valore è "compilato" se esiste e non è più un segnaposto.
+ * Il sito usa questa funzione per nascondere le parti non ancora pronte,
+ * invece di mostrare "[DA COMPILARE...]" ai visitatori.
+ */
+export function compilato(valore?: string): boolean {
+  return Boolean(valore && valore.trim() && !valore.includes("[DA COMPILARE"));
+}
+
+/** Gli orari da mostrare, escludendo le righe non ancora compilate */
+export function orariCompilati(): readonly string[] {
+  return siteConfig.orari.filter((riga) => compilato(riga));
+}
+
+/** I paragrafi della biografia, esclusi quelli non ancora scritti */
+export function storiaCompilata(): readonly string[] {
+  return siteConfig.storia.paragrafi.filter((p) => compilato(p));
+}
+
 /** Testo precompilato del messaggio WhatsApp dalla pagina di un oggetto */
 export function whatsappLink(nomeOggetto?: string): string {
   const testo = nomeOggetto

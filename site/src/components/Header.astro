@@ -1,11 +1,17 @@
 ---
 import Logo from "./Logo.astro";
+import { storiaCompilata } from "../config/site.config";
 
 const percorso = Astro.url.pathname;
+
+/* "La storia" compare nel menu solo quando la biografia è stata scritta:
+   meglio nessuna voce che una pagina vuota. */
 const voci = [
   { href: "/", etichetta: "Home" },
   { href: "/catalogo/", etichetta: "Catalogo" },
-  { href: "/la-storia/", etichetta: "La storia" },
+  ...(storiaCompilata().length > 0
+    ? [{ href: "/la-storia/", etichetta: "La storia" }]
+    : []),
   { href: "/contatti/", etichetta: "Contatti" },
 ];
 
