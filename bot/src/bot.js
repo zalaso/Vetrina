@@ -111,29 +111,50 @@ async function mandaRiepilogo(ctx, record) {
   });
 }
 
-/** Mostra un candidato (per vendita/modifica) con i bottoni di conferma. */
+/* Tipi di operazione che richiedono di individuare un oggetto esistente */
+const OPERAZIONI = {
+  vendita: {
+    prefisso: "vend",
+    domanda: "È questo che hai venduto?",
+  },
+  ritiro: {
+    prefisso: "rit",
+    domanda: "È questo da togliere dal catalogo?",
+  },
+  modifica: {
+    prefisso: "mod",
+    domanda: "È questo da modificare?",
+  },
+  foto: {
+    prefisso: "foto",
+    domanda: "È questo il pezzo di cui vuoi cambiare la foto?",
+  },
+};
+
+/** Mostra un candidato con i bottoni di conferma. */
 async function mostraCandidato(ctx, sessione) {
   const recordId = sessione.candidati[sessione.indice];
   if (!recordId) {
-    cancellaSessione(ctx.chat.id);
+    await cancellaSessione(ctx.chat.id);
     await ctx.reply(
       "Non trovo altri oggetti che corrispondono. Prova a descrivermelo con altre parole."
     );
     return;
   }
+
+  const operazione = OPERAZIONI[sessione.tipo];
   const record = await getRecord(recordId);
   const f = record.fields;
-  const conferma = sessione.tipo === "vendita" ? `vend:${record.id}` : `mod:${record.id}`;
-  const no = sessione.tipo === "vendita" ? "vendno" : "modno";
+
   const tastiera = new InlineKeyboard()
-    .text("✅ È questo", conferma)
-    .text("❌ No, un altro", no);
+    .text("✅ È questo", `${operazione.prefisso}:${record.id}`)
+    .text("❌ No, un altro", "altro");
 
   const didascalia = [
     `*${f[F.nome] ?? "Oggetto"}*`,
     f[F.epoca] ?? null,
     `Prezzo: ${euro(f[F.prezzoVendita])}`,
-    sessione.tipo === "vendita" ? "\nÈ questo che hai venduto?" : "\nÈ questo da modificare?",
+    `\n${operazione.domanda}`,
   ]
     .filter(Boolean)
     .join("\n");
@@ -158,9 +179,13 @@ const MESSAGGIO_AIUTO = [
   "",
   "📷 *Aggiungere un oggetto*: mandami una o più foto con due parole di descrizione (scritta o vocale). Es: \"comò piemontese fine ottocento, pagato 400, lo vendo a 1200\".",
   "",
-  "💰 *Segnare una vendita*: scrivimi \"venduto il comò\" e ti chiedo conferma.",
+  "💰 *Segnare una vendita*: \"venduto il comò\".",
   "",
-  "✏️ *Cambiare un prezzo*: \"il comò ora costa 1000\".",
+  "🚫 *Togliere un pezzo senza venderlo*: \"togli la poltrona\", \"me la tengo\".",
+  "",
+  "✏️ *Cambiare un dato*: \"il comò ora costa 1000\".",
+  "",
+  "🖼 *Cambiare una foto*: \"cambia la foto del comò\", poi mandami quella nuova.",
   "",
   "📋 *Vedere il catalogo*: \"cosa ho in vendita?\"",
   "",
@@ -174,7 +199,7 @@ bot.command(["start", "aiuto", "help"], (ctx) =>
 );
 
 /* ----------------------------------------------------------------------------
- * Foto in arrivo: nuova bozza o foto aggiuntiva della bozza in corso
+ * Foto in arrivo
  * ------------------------------------------------------------------------- */
 bot.on("message:photo", async (ctx) => {
   try {
@@ -185,7 +210,29 @@ bot.on("message:photo", async (ctx) => {
     const buffer = await scaricaFileTelegram(ctx, fotoTg.file_id);
     const urlFoto = await caricaFoto(buffer);
 
-    // C'è già una bozza in lavorazione per questa chat?
+    // 1. Stiamo aspettando la nuova foto di un oggetto già pubblicato?
+    const sessione = await leggiSessione(ctx.chat.id);
+    if (sessione?.tipo === "attesa-foto") {
+      const record = await getRecord(sessione.recordId);
+      const foto = sessione.sostituisci ? [] : fotoDaRecord(record);
+      foto.push(urlFoto);
+      const aggiornato = await aggiornaRecord(sessione.recordId, {
+        [F.foto]: foto.join("\n"),
+      });
+
+      // Le foto successive si aggiungono, non sostituiscono di nuovo
+      await salvaSessione(ctx.chat.id, { ...sessione, sostituisci: false });
+
+      await ctx.reply(
+        `🖼 Foto aggiornata per *${aggiornato.fields[F.nome]}* (ora ne ha ${foto.length}).\n` +
+          "Puoi mandarne altre, oppure lasciar stare: il sito si aggiorna da solo.",
+        { parse_mode: "Markdown" }
+      );
+      await rigeneraSito();
+      return;
+    }
+
+    // 2. C'è una bozza in lavorazione per questa chat?
     let bozza = await trovaBozzaAttiva(ctx.chat.id);
 
     if (bozza && ["raccolta-foto", "conferma"].includes(bozza.fields[F.fase])) {
@@ -205,7 +252,7 @@ bot.on("message:photo", async (ctx) => {
       return;
     }
 
-    // Nuova bozza
+    // 3. Nuovo oggetto
     bozza = await creaRecord({
       [F.foto]: urlFoto,
       [F.stato]: "Bozza",
@@ -277,7 +324,13 @@ bot.on("message:text", async (ctx) => {
 async function gestisciTesto(ctx, testo) {
   if (!testo) return;
 
-  // 1. C'è una bozza che aspetta la descrizione o una correzione?
+  // 1. Stiamo aspettando una foto? Un testo qui vuol dire che ha cambiato idea.
+  const sessione = await leggiSessione(ctx.chat.id);
+  if (sessione?.tipo === "attesa-foto") {
+    await cancellaSessione(ctx.chat.id);
+  }
+
+  // 2. C'è una bozza che aspetta la descrizione o una correzione?
   const bozza = await trovaBozzaAttiva(ctx.chat.id);
   if (bozza) {
     const fase = bozza.fields[F.fase];
@@ -312,7 +365,7 @@ async function gestisciTesto(ctx, testo) {
     }
   }
 
-  // 2. Comando libero: vendita, modifica, consultazione
+  // 3. Comando libero
   await ctx.replyWithChatAction("typing");
   const disponibili = await listaDisponibili();
   const perAI = disponibili.map((r) => ({
@@ -330,7 +383,9 @@ async function gestisciTesto(ctx, testo) {
 
   switch (intento.azione) {
     case "vendita":
-    case "modifica": {
+    case "ritiro":
+    case "modifica":
+    case "foto": {
       const candidati = (intento.candidati ?? []).filter((id) =>
         disponibili.some((r) => r.id === id)
       );
@@ -340,13 +395,15 @@ async function gestisciTesto(ctx, testo) {
         );
         return;
       }
-      salvaSessione(ctx.chat.id, {
+      const nuova = {
         tipo: intento.azione,
         candidati,
         indice: 0,
         modifiche: intento.modifiche ?? {},
-      });
-      await mostraCandidato(ctx, leggiSessione(ctx.chat.id));
+        sostituisci: intento.sostituisci ?? false,
+      };
+      await salvaSessione(ctx.chat.id, nuova);
+      await mostraCandidato(ctx, nuova);
       return;
     }
 
@@ -431,7 +488,7 @@ bot.on("callback_query:data", async (ctx) => {
         [F.stato]: "Venduto",
         [F.dataVendita]: oggiISO(),
       });
-      cancellaSessione(ctx.chat.id);
+      await cancellaSessione(ctx.chat.id);
       await ctx.answerCallbackQuery();
       await ctx.reply(
         `🎉 Segnato come venduto: ${record.fields[F.nome]}.\nIl sito si aggiorna in un minuto circa.`
@@ -440,11 +497,25 @@ bot.on("callback_query:data", async (ctx) => {
       return;
     }
 
+    // ✅ Ritiro confermato (esce dal catalogo, ma NON è una vendita)
+    if (dati.startsWith("rit:")) {
+      const recordId = dati.slice(4);
+      const record = await aggiornaRecord(recordId, { [F.stato]: "Ritirato" });
+      await cancellaSessione(ctx.chat.id);
+      await ctx.answerCallbackQuery();
+      await ctx.reply(
+        `🚫 Tolto dal catalogo: ${record.fields[F.nome]}.\n` +
+          "Non risulta venduto, quindi non entra nei guadagni. Il sito si aggiorna in un minuto circa."
+      );
+      await rigeneraSito();
+      return;
+    }
+
     // ✅ Modifica confermata
     if (dati.startsWith("mod:")) {
       const recordId = dati.slice(4);
-      const sessione = leggiSessione(ctx.chat.id);
-      if (!sessione || !sessione.modifiche || Object.keys(sessione.modifiche).length === 0) {
+      const sessione = await leggiSessione(ctx.chat.id);
+      if (!sessione?.modifiche || Object.keys(sessione.modifiche).length === 0) {
         await ctx.answerCallbackQuery();
         await ctx.reply(
           "Mi sono perso la modifica da fare. Riscrivimi cosa vuoi cambiare, per favore."
@@ -452,7 +523,7 @@ bot.on("callback_query:data", async (ctx) => {
         return;
       }
       const record = await aggiornaRecord(recordId, campiPerAirtable(sessione.modifiche));
-      cancellaSessione(ctx.chat.id);
+      await cancellaSessione(ctx.chat.id);
       await ctx.answerCallbackQuery();
       await ctx.reply(
         `✏️ Aggiornato: ${record.fields[F.nome]}.\nIl sito si aggiorna in un minuto circa.`
@@ -461,18 +532,37 @@ bot.on("callback_query:data", async (ctx) => {
       return;
     }
 
-    // ❌ Non è questo: mostra il prossimo candidato
-    if (dati === "vendno" || dati === "modno") {
+    // ✅ Oggetto individuato: ora aspettiamo la foto nuova
+    if (dati.startsWith("foto:")) {
+      const recordId = dati.slice(5);
+      const sessione = await leggiSessione(ctx.chat.id);
+      const record = await getRecord(recordId);
+      await salvaSessione(ctx.chat.id, {
+        tipo: "attesa-foto",
+        recordId,
+        sostituisci: sessione?.sostituisci ?? false,
+      });
       await ctx.answerCallbackQuery();
-      const sessione = leggiSessione(ctx.chat.id);
-      if (!sessione) {
-        await ctx.reply(
-          "Riproviamo: scrivimi di nuovo di quale oggetto si tratta."
-        );
+      await ctx.reply(
+        `Va bene: *${record.fields[F.nome]}*.\n` +
+          (sessione?.sostituisci
+            ? "Mandami la foto nuova e sostituisco quelle che ci sono."
+            : "Mandami la foto da aggiungere."),
+        { parse_mode: "Markdown" }
+      );
+      return;
+    }
+
+    // ❌ Non è questo: mostra il prossimo candidato
+    if (dati === "altro") {
+      await ctx.answerCallbackQuery();
+      const sessione = await leggiSessione(ctx.chat.id);
+      if (!sessione?.candidati) {
+        await ctx.reply("Riproviamo: scrivimi di nuovo di quale oggetto si tratta.");
         return;
       }
       sessione.indice += 1;
-      salvaSessione(ctx.chat.id, sessione);
+      await salvaSessione(ctx.chat.id, sessione);
       await mostraCandidato(ctx, sessione);
       return;
     }

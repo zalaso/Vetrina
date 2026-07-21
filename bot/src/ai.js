@@ -109,18 +109,33 @@ export async function interpretaComando(testo, oggetti) {
 Il titolare gestisce il catalogo scrivendo frasi libere. Interpreta la sua richiesta.
 Rispondi SOLO con un JSON:
 {
-  "azione": "vendita" | "modifica" | "elenco" | "guadagno" | "aiuto" | "altro",
-  "candidati": [/* per vendita/modifica: gli id degli oggetti che corrispondono,
-                  dal più probabile al meno probabile, max 5. Cerca in nome e descrizione. */],
+  "azione": "vendita" | "ritiro" | "modifica" | "foto" | "elenco" | "guadagno" | "aiuto" | "altro",
+  "candidati": [/* per vendita/ritiro/modifica/foto: gli id degli oggetti che
+                  corrispondono, dal più probabile al meno probabile, max 5.
+                  Cerca nel nome e nella descrizione. */],
   "modifiche": {/* solo per modifica: i campi da cambiare tra
                   "nome","categoria","epoca","materiale","dimensioni",
                   "prezzoVendita","prezzoAcquisto" con i nuovi valori */},
+  "sostituisci": /* solo per foto: true se vuole SOSTITUIRE le foto esistenti,
+                    false se vuole AGGIUNGERNE una in più */,
   "anno": /* solo per guadagno: l'anno richiesto, default ${annoCorrente} */
 }
-Note:
-- "venduto il comò", "ho venduto la poltrona", "togli lo specchio" => azione "vendita"
-  (anche togliere/rimuovere si tratta come vendita).
-- "il comò ora costa 1000", "cambia il prezzo della credenza" => azione "modifica".
+
+Distinzione importante tra "vendita" e "ritiro":
+- "vendita" = il pezzo è stato VENDUTO a un cliente. Es: "venduto il comò",
+  "ho venduto la poltrona", "il quadro l'ha preso un signore".
+- "ritiro" = il pezzo esce dal catalogo SENZA essere stato venduto. Es:
+  "togli la poltrona", "rimuovi lo specchio", "non lo vendo più", "me lo tengo",
+  "si è rotto", "l'avevo inserito per sbaglio", "nascondi la credenza".
+Nel dubbio, se non è esplicito che c'è stata una vendita, scegli "ritiro".
+
+Altre azioni:
+- "il comò ora costa 1000", "cambia il prezzo della credenza",
+  "la poltrona è del Settecento" => "modifica".
+- "cambia la foto del comò", "rifaccio la foto", "la foto è venuta male",
+  "aggiungi una foto alla credenza" => "foto"
+  ("cambia/sostituisci/rifare" => sostituisci: true;
+   "aggiungi/un'altra foto" => sostituisci: false).
 - "cosa ho in vendita?", "che oggetti ho?" => "elenco".
 - "quanto ho guadagnato quest'anno/nel 2025?" => "guadagno".
 - Se chiede aiuto o saluta => "aiuto". Se non capisci => "altro".

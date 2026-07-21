@@ -29,12 +29,15 @@ export const F = {
   fase: "Fase",
 };
 
-function urlBase() {
-  return `https://api.airtable.com/v0/${config.airtableBaseId}/${encodeURIComponent(TABELLA)}`;
-}
-
-async function chiamata(metodo, percorso = "", body = undefined) {
-  const risposta = await fetch(`${urlBase()}${percorso}`, {
+/** Chiamata generica a una qualunque tabella della base */
+export async function chiamataTabella(
+  tabella,
+  metodo,
+  percorso = "",
+  body = undefined
+) {
+  const url = `https://api.airtable.com/v0/${config.airtableBaseId}/${encodeURIComponent(tabella)}${percorso}`;
+  const risposta = await fetch(url, {
     method: metodo,
     headers: {
       Authorization: `Bearer ${config.airtableApiKey}`,
@@ -47,6 +50,9 @@ async function chiamata(metodo, percorso = "", body = undefined) {
   }
   return risposta.json();
 }
+
+const chiamata = (metodo, percorso, body) =>
+  chiamataTabella(TABELLA, metodo, percorso, body);
 
 export async function creaRecord(fields) {
   const dati = await chiamata("POST", "", { records: [{ fields }], typecast: true });

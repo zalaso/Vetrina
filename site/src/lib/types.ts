@@ -10,7 +10,12 @@ export const CATEGORIE = [
 
 export type Categoria = (typeof CATEGORIE)[number];
 
-export type Stato = "Disponibile" | "Venduto" | "Bozza";
+/**
+ * "Ritirato" = tolto dal catalogo senza essere stato venduto (pezzo tenuto,
+ * rotto o inserito per sbaglio). Non compare da nessuna parte sul sito e non
+ * entra nel calcolo dei guadagni.
+ */
+export type Stato = "Disponibile" | "Venduto" | "Bozza" | "Ritirato";
 
 /** Un oggetto del catalogo, come arriva da Airtable (o dai dati mock) */
 export interface Oggetto {

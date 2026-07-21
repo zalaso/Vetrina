@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "node --env-file=.env dev.js",
     "set-webhook": "node --env-file=.env scripts/set-webhook.js",
-    "create-airtable-table": "node --env-file=.env scripts/create-airtable-table.js"
+    "create-airtable-table": "node --env-file=.env scripts/create-airtable-table.js",
+    "aggiorna-airtable": "node --env-file=.env scripts/aggiorna-airtable.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.70.0",
