@@ -74,14 +74,24 @@ Titolare ──(foto/messaggi)──▶ Bot Telegram ──▶ Airtable (tabella
    | Foto | Testo lungo | URL Cloudinary, uno per riga (li scrive il bot) |
    | Prezzo di vendita | Numero | se vuoto il sito mostra "Prezzo su richiesta" |
    | Prezzo di acquisto | Numero | **mai** esposto sul sito |
-   | Stato | Single select | Disponibile, Venduto, Bozza |
+   | Stato | Single select | Disponibile, Venduto, Bozza, Ritirato |
    | Data inserimento | Data | |
    | Data vendita | Data | |
    | Note private | Testo lungo | |
    | Chat | Testo | campo tecnico del bot |
    | Fase | Testo | campo tecnico del bot |
 
-   La tabella dei prezzi di acquisto e le note private restano solo su Airtable: il sito non li legge mai.
+   Il prezzo di acquisto e le note private restano solo su Airtable: il sito non li legge mai.
+
+   **Significato degli stati:** `Disponibile` è in vetrina; `Venduto` compare nella sezione "Venduti di recente" e conta nel calcolo del guadagno; `Ritirato` è stato tolto dal catalogo *senza* essere venduto (tenuto, rotto o inserito per sbaglio) e non compare da nessuna parte né incide sui conti; `Bozza` è in lavorazione sul bot.
+
+5. Crea la tabella di servizio del bot:
+
+   ```bash
+   npm run aggiorna-airtable
+   ```
+
+   Aggiunge la tabella **Sessioni**, dove il bot tiene le operazioni in attesa di conferma. Serve perché su Vercel ogni messaggio può essere gestito da un'istanza diversa: senza questa tabella le conferme funzionerebbero in modo imprevedibile. Non va mai modificata a mano.
 
 ---
 
@@ -136,7 +146,9 @@ Le foto caricate dal bot finiscono nella cartella `hd-design`; il sito le richie
 - **Foto senza descrizione**: il bot chiede *"Che oggetto è?"* — basta rispondere, anche con un vocale.
 - **Correggere**: tocca **✏️ Correggi** e scrivi la correzione come viene, es. *"il prezzo è 1000, non 1200"*.
 - **Vendita**: scrivi *"venduto il comò"*. Il bot mostra la foto dell'oggetto e chiede **✅ È questo** / **❌ No, un altro**.
-- **Cambiare un prezzo**: *"il comò ora costa 1000"*, stessa conferma con bottoni.
+- **Togliere senza vendere**: *"togli la poltrona"*, *"me la tengo"*, *"si è rotta"*. Il pezzo passa in **Ritirato**: sparisce dal sito ma non risulta venduto e non entra nel calcolo del guadagno.
+- **Cambiare un prezzo o un dato**: *"il comò ora costa 1000"*, *"la credenza è del Settecento"*, stessa conferma con bottoni.
+- **Cambiare una foto**: *"cambia la foto del comò"* (sostituisce) oppure *"aggiungi una foto alla credenza"* (aggiunge). Dopo la conferma il bot resta in attesa della foto nuova.
 - **Consultare**: *"cosa ho in vendita?"* oppure *"quanto ho guadagnato quest'anno?"*.
 
 Nessuna modifica al catalogo avviene senza una conferma esplicita con i bottoni.

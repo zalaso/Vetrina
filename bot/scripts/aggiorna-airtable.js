@@ -1,14 +1,14 @@
 /**
- * Aggiorna lo schema Airtable per le funzioni aggiunte dopo il primo rilascio:
+ * Crea la tabella "Sessioni", dove il bot ricorda le operazioni in attesa di
+ * conferma (serve perché su Vercel ogni messaggio può essere gestito da
+ * un'istanza diversa, che non condivide la memoria con le precedenti).
  *
- *  1. crea la tabella "Sessioni", dove il bot ricorda le operazioni in attesa
- *     di conferma (serve perché su Vercel ogni messaggio può essere gestito da
- *     un'istanza diversa, che non condivide la memoria con le precedenti);
- *  2. aggiunge lo stato "Ritirato" al campo Stato della tabella "Oggetti",
- *     per distinguere un pezzo tolto dal catalogo da uno realmente venduto.
+ * Lo script è ripetibile: se la tabella esiste già, lo rileva e si ferma.
+ * Richiede il solo scope "schema.bases:write" (non serve "schema.bases:read":
+ * invece di leggere prima lo schema, proviamo a creare e interpretiamo l'esito).
  *
- * Lo script è ripetibile: se una cosa esiste già, la salta.
- * Serve un token con scope "schema.bases:write".
+ * Nota: lo stato "Ritirato" del campo Stato NON va creato qui. Airtable lo
+ * aggiunge da solo alla prima scrittura, perché il bot scrive con typecast.
  *
  * Uso: npm run aggiorna-airtable
  */
@@ -20,32 +20,30 @@ if (!apiKey || !baseId) {
   process.exit(1);
 }
 
-const meta = `https://api.airtable.com/v0/meta/bases/${baseId}/tables`;
 const headers = {
   Authorization: `Bearer ${apiKey}`,
   "Content-Type": "application/json",
 };
 
-async function leggiTabelle() {
-  const r = await fetch(meta, { headers });
-  if (!r.ok) throw new Error(`Lettura schema fallita (${r.status}): ${await r.text()}`);
-  return (await r.json()).tables;
+/** La tabella risponde alle letture dei record? Allora esiste ed è usabile. */
+async function tabellaUsabile(nome) {
+  const r = await fetch(
+    `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(nome)}?pageSize=1`,
+    { headers }
+  );
+  return r.ok;
 }
 
-let tabelle = await leggiTabelle();
-
-/* --- 1. Tabella "Sessioni" ------------------------------------------------ */
-
-if (tabelle.some((t) => t.name === "Sessioni")) {
-  console.log('• Tabella "Sessioni": esiste già, salto.');
+if (await tabellaUsabile("Sessioni")) {
+  console.log('• Tabella "Sessioni": esiste già ed è raggiungibile. Niente da fare.');
 } else {
-  const r = await fetch(meta, {
+  const r = await fetch(`https://api.airtable.com/v0/meta/bases/${baseId}/tables`, {
     method: "POST",
     headers,
     body: JSON.stringify({
       name: "Sessioni",
       description:
-        "Uso interno del bot: operazioni in attesa di conferma. Non toccare.",
+        "Uso interno del bot: operazioni in attesa di conferma. Non modificare a mano.",
       fields: [
         { name: "Chat", type: "singleLineText" },
         {
@@ -61,36 +59,30 @@ if (tabelle.some((t) => t.name === "Sessioni")) {
       ],
     }),
   });
-  if (!r.ok) throw new Error(`Creazione "Sessioni" fallita (${r.status}): ${await r.text()}`);
-  console.log('✅ Tabella "Sessioni" creata.');
+
+  if (r.ok) {
+    console.log('✅ Tabella "Sessioni" creata.');
+  } else {
+    const dettaglio = await r.text();
+    if (r.status === 403) {
+      console.error(
+        '❌ Il token non ha il permesso di creare tabelle.\n' +
+          '   Aggiungi lo scope "schema.bases:write" su https://airtable.com/create/tokens\n' +
+          "   oppure crea la tabella a mano (istruzioni nel README).\n"
+      );
+    } else {
+      console.error(`❌ Creazione fallita (${r.status}): ${dettaglio}\n`);
+    }
+    process.exitCode = 1;
+  }
 }
 
-/* --- 2. Stato "Ritirato" -------------------------------------------------- */
-
-tabelle = await leggiTabelle();
-const oggetti = tabelle.find((t) => t.name === "Oggetti");
-if (!oggetti) throw new Error('Tabella "Oggetti" non trovata nella base.');
-
-const stato = oggetti.fields.find((f) => f.name === "Stato");
-if (!stato) throw new Error('Campo "Stato" non trovato nella tabella Oggetti.');
-
-const scelte = stato.options?.choices ?? [];
-if (scelte.some((c) => c.name === "Ritirato")) {
-  console.log('• Stato "Ritirato": esiste già, salto.');
-} else {
-  const r = await fetch(`${meta}/${oggetti.id}/fields/${stato.id}`, {
-    method: "PATCH",
-    headers,
-    body: JSON.stringify({
-      options: {
-        // Le scelte esistenti vanno ripassate con il loro id, altrimenti
-        // Airtable le considera rimosse.
-        choices: [...scelte.map((c) => ({ id: c.id, name: c.name })), { name: "Ritirato" }],
-      },
-    }),
-  });
-  if (!r.ok) throw new Error(`Aggiunta stato "Ritirato" fallita (${r.status}): ${await r.text()}`);
-  console.log('✅ Stato "Ritirato" aggiunto al campo Stato.');
+/* Verifica finale: il bot riuscirà davvero a usarla? */
+if (process.exitCode !== 1) {
+  const ok = await tabellaUsabile("Sessioni");
+  console.log(
+    ok
+      ? "✅ Verifica: il bot può leggere e scrivere la tabella. Tutto pronto."
+      : "⚠️  La tabella risulta creata ma non raggiungibile in lettura: controlla che il token abbia accesso a questa base."
+  );
 }
-
-console.log("\nSchema aggiornato.");
