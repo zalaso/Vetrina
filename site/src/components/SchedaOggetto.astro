@@ -1,0 +1,108 @@
+---
+import type { Oggetto } from "../lib/types";
+import { formatPrezzo } from "../lib/types";
+
+interface Props {
+  oggetto: Oggetto;
+  /** true nella sezione "venduti di recente": niente prezzo, aspetto più discreto */
+  venduto?: boolean;
+}
+
+const { oggetto, venduto = false } = Astro.props;
+const href = `/oggetti/${oggetto.id}/`;
+---
+
+<a class:list={["scheda", { "scheda--venduta": venduto }]} href={href}>
+  <div class="scheda__foto">
+    <img
+      src={oggetto.foto[0]}
+      alt={oggetto.nome}
+      loading="lazy"
+      width="600"
+      height="750"
+    />
+    {venduto && <span class="scheda__timbro">Venduto</span>}
+  </div>
+  <div class="scheda__testo">
+    <h3 class="scheda__nome">{oggetto.nome}</h3>
+    {oggetto.epoca && <p class="scheda__epoca">{oggetto.epoca}</p>}
+    {!venduto && <p class="scheda__prezzo">{formatPrezzo(oggetto.prezzo)}</p>}
+  </div>
+</a>
+
+<style>
+  .scheda {
+    display: block;
+    text-decoration: none;
+    color: var(--inchiostro);
+  }
+
+  .scheda__foto {
+    position: relative;
+    overflow: hidden;
+    background: var(--sfondo-scuro);
+    border-radius: var(--raggio);
+    aspect-ratio: 4 / 5;
+  }
+
+  .scheda__foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .scheda:hover .scheda__foto img {
+    transform: scale(1.03);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scheda:hover .scheda__foto img {
+      transform: none;
+    }
+  }
+
+  .scheda__timbro {
+    position: absolute;
+    left: 0.9rem;
+    bottom: 0.9rem;
+    background: var(--carta);
+    color: var(--grigio);
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    border-radius: var(--raggio);
+  }
+
+  .scheda__testo {
+    padding-top: 1rem;
+  }
+
+  .scheda__nome {
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .scheda:hover .scheda__nome {
+    color: var(--accento);
+  }
+
+  .scheda__epoca {
+    color: var(--grigio-chiaro);
+    font-size: 1rem;
+    margin-top: 0.15rem;
+  }
+
+  .scheda__prezzo {
+    margin-top: 0.5rem;
+    font-weight: 500;
+    color: var(--grigio);
+  }
+
+  .scheda--venduta {
+    opacity: 0.85;
+  }
+</style>

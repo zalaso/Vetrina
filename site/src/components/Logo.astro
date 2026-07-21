@@ -1,0 +1,61 @@
+---
+/**
+ * Lockup tipografico del marchio HD Design: monogramma "HD" in serif
+ * con "DESIGN" spaziato sotto, come nel logo fornito dal cliente.
+ * Eredita il colore dal contesto (currentColor), così funziona
+ * sia su fondo chiaro sia nel footer scuro.
+ *
+ * Se in futuro si vuole usare il file originale del logo, basta
+ * metterlo in /public (es. logo.svg) e sostituire questo componente
+ * con un <img>.
+ */
+interface Props {
+  /** Dimensione del monogramma, es. "1.9rem" (default) o "2.6rem" */
+  dimensione?: string;
+}
+
+const { dimensione = "1.9rem" } = Astro.props;
+---
+
+<span class="logo" style={`--logo-dimensione: ${dimensione}`}>
+  <span class="logo__hd" aria-hidden="true">HD</span>
+  <span class="logo__design" aria-hidden="true">Design</span>
+  <span class="visivamente-nascosto">HD Design</span>
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    color: inherit;
+  }
+
+  .logo__hd {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: var(--logo-dimensione);
+    letter-spacing: -0.06em;
+  }
+
+  .logo__design {
+    font-family: var(--sans);
+    font-weight: 400;
+    font-size: calc(var(--logo-dimensione) * 0.26);
+    letter-spacing: 0.52em;
+    text-transform: uppercase;
+    margin-top: 0.35em;
+    /* compensa lo spazio finale del letter-spacing per centrare davvero */
+    margin-right: -0.52em;
+  }
+
+  .visivamente-nascosto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+</style>

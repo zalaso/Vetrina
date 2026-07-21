@@ -1,0 +1,158 @@
+---
+import Base from "../layouts/Base.astro";
+import { siteConfig, whatsappLink } from "../config/site.config";
+
+const { storia } = siteConfig;
+const fotoTitolare =
+  storia.foto || "https://picsum.photos/seed/ritratto-antiquario/900/1100";
+
+/* Il segnaposto della citazione non va mostrato finché non è compilato */
+const citazione =
+  storia.citazione && !storia.citazione.startsWith("[DA COMPILARE")
+    ? storia.citazione
+    : "";
+---
+
+<Base
+  titolo="La storia"
+  descrizione={`Chi è ${siteConfig.titolare}: la storia dell'antiquario dietro ${siteConfig.nomeAttivita}.`}
+>
+  <section class="sezione">
+    <div class="contenitore storia">
+      <div class="storia__foto">
+        <img
+          src={fotoTitolare}
+          alt={`${siteConfig.titolare} nella sua bottega`}
+          width="900"
+          height="1100"
+          fetchpriority="high"
+        />
+      </div>
+
+      <div class="storia__testo">
+        <p class="storia__nome">{siteConfig.titolare}</p>
+        <p class="storia__ruolo">{storia.sottotitolo}</p>
+        <h1 class="storia__titolo">{storia.titolo}</h1>
+
+        {storia.paragrafi.map((paragrafo) => (
+          <p class="storia__paragrafo">{paragrafo}</p>
+        ))}
+
+        {
+          citazione && (
+            <blockquote class="storia__citazione">
+              <p>“{citazione}”</p>
+            </blockquote>
+          )
+        }
+
+        <div class="storia__azioni">
+          <a class="bottone bottone--pieno" href="/catalogo/">Sfoglia il catalogo</a>
+          <a class="bottone bottone--contorno" href="/contatti/">Vieni a trovarci</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fascia finale -->
+  <section class="fascia">
+    <div class="contenitore fascia__interno">
+      <h2 class="fascia__titolo">Cerchi un pezzo particolare?</h2>
+      <p class="fascia__testo">
+        Raccontacelo: spesso sappiamo dove trovarlo.
+      </p>
+      <a class="bottone bottone--pieno" href={whatsappLink()}>Scrivici su WhatsApp</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .storia {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+
+  .storia__foto img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--raggio);
+    box-shadow: 0 24px 60px rgba(22, 21, 19, 0.16);
+  }
+
+  .storia__nome {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .storia__ruolo {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--grigio-chiaro);
+    margin-top: 0.2rem;
+  }
+
+  .storia__titolo {
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    margin-top: 1.4rem;
+    line-height: 1.12;
+  }
+
+  .storia__paragrafo {
+    margin-top: 1.3rem;
+    color: var(--grigio);
+    max-width: 58ch;
+  }
+
+  .storia__citazione {
+    margin: 2.2rem 0 0;
+    padding-left: 1.4rem;
+    border-left: 2px solid var(--inchiostro);
+  }
+
+  .storia__citazione p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.45rem;
+    line-height: 1.4;
+    color: var(--inchiostro);
+    padding-bottom: 0.2rem;
+  }
+
+  .storia__azioni {
+    margin-top: 2.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .fascia {
+    background: var(--sfondo-scuro);
+    border-top: 1px solid var(--linea);
+    padding-block: clamp(3rem, 7vw, 5rem);
+    text-align: center;
+  }
+
+  .fascia__titolo {
+    font-size: clamp(1.7rem, 3.5vw, 2.3rem);
+  }
+
+  .fascia__testo {
+    margin-top: 0.7rem;
+    margin-bottom: 1.8rem;
+    color: var(--grigio);
+  }
+
+  @media (max-width: 900px) {
+    .storia {
+      grid-template-columns: 1fr;
+    }
+
+    .storia__foto {
+      max-width: 420px;
+    }
+  }
+</style>

@@ -1,0 +1,104 @@
+---
+import Logo from "./Logo.astro";
+
+const percorso = Astro.url.pathname;
+const voci = [
+  { href: "/", etichetta: "Home" },
+  { href: "/catalogo/", etichetta: "Catalogo" },
+  { href: "/la-storia/", etichetta: "La storia" },
+  { href: "/contatti/", etichetta: "Contatti" },
+];
+
+function attiva(href: string): boolean {
+  if (href === "/") return percorso === "/";
+  return percorso.startsWith(href);
+}
+---
+
+<header class="testata">
+  <div class="contenitore testata__interno">
+    <a href="/" class="testata__marchio" aria-label="HD Design, torna alla home">
+      <Logo dimensione="2rem" />
+    </a>
+    <nav aria-label="Navigazione principale">
+      <ul class="testata__menu">
+        {
+          voci.map((voce) => (
+            <li>
+              <a
+                href={voce.href}
+                class:list={["testata__voce", { attiva: attiva(voce.href) }]}
+                aria-current={attiva(voce.href) ? "page" : undefined}
+              >
+                {voce.etichetta}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .testata {
+    background: var(--sfondo);
+    border-bottom: 1px solid var(--linea);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .testata__interno {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    height: 76px;
+  }
+
+  .testata__marchio {
+    text-decoration: none;
+    color: var(--inchiostro);
+    display: flex;
+    align-items: center;
+  }
+
+  .testata__menu {
+    display: flex;
+    align-items: center;
+    gap: clamp(1.1rem, 3vw, 2.2rem);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .testata__voce {
+    text-decoration: none;
+    color: var(--grigio);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    padding-block: 0.35rem;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .testata__voce:hover {
+    color: var(--inchiostro);
+  }
+
+  .testata__voce.attiva {
+    color: var(--inchiostro);
+    border-bottom-color: var(--accento);
+  }
+
+  @media (max-width: 560px) {
+    .testata__interno {
+      height: auto;
+      flex-direction: column;
+      align-items: center;
+      padding-block: 0.9rem 0.7rem;
+      gap: 0.4rem;
+    }
+  }
+</style>

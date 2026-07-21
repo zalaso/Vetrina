@@ -1,0 +1,164 @@
+/* ---------------------------------------------------------------------------
+   HD Design — foglio di stile globale
+   Palette premium monocromatica: off-white, grigi caldi neutri, quasi-nero.
+   Tipografia: Cormorant Garamond (titoli) + Work Sans (testi).
+   Testi grandi e contrasto alto: il sito è pensato anche per chi
+   non è pratico del web.
+--------------------------------------------------------------------------- */
+
+:root {
+  /* Palette */
+  --sfondo: #f4f3f1;
+  --sfondo-scuro: #e9e7e3;
+  --carta: #fcfbf9;
+  --inchiostro: #161513;
+  --grigio: #55524d;
+  --grigio-chiaro: #8f8b84;
+  --accento: #1c1a18;
+  --accento-scuro: #0d0c0b;
+  --linea: #dcd9d4;
+
+  /* Tipografia */
+  --serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --sans: "Work Sans Variable", "Segoe UI", Arial, sans-serif;
+
+  /* Ritmo */
+  --contenitore: 1200px;
+  --raggio: 2px;
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--sfondo);
+  color: var(--inchiostro);
+  font-family: var(--sans);
+  font-size: 1.125rem; /* 18px: leggibile anche per chi vede poco */
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--serif);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--inchiostro);
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--inchiostro);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--inchiostro);
+  outline-offset: 3px;
+  border-radius: var(--raggio);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* --- Layout di base ------------------------------------------------------ */
+
+.contenitore {
+  max-width: var(--contenitore);
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.sezione {
+  padding-block: clamp(3.5rem, 8vw, 6.5rem);
+}
+
+/* --- Bottoni ------------------------------------------------------------- */
+
+.bottone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-family: var(--sans);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  padding: 0.9rem 1.9rem;
+  border-radius: var(--raggio);
+  border: 1.5px solid transparent;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.bottone:active {
+  transform: translateY(1px);
+}
+
+.bottone--pieno {
+  background: var(--accento);
+  color: var(--carta);
+}
+
+.bottone--pieno:hover {
+  background: var(--accento-scuro);
+}
+
+.bottone--contorno {
+  background: transparent;
+  color: var(--inchiostro);
+  border-color: var(--grigio);
+}
+
+.bottone--contorno:hover {
+  background: var(--inchiostro);
+  color: var(--carta);
+  border-color: var(--inchiostro);
+}
+
+/* --- Titoli di sezione --------------------------------------------------- */
+
+.titolo-sezione {
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  margin-bottom: 0.4em;
+}
+
+.sottotitolo-sezione {
+  color: var(--grigio);
+  max-width: 60ch;
+}

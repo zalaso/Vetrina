@@ -1,0 +1,192 @@
+---
+import Base from "../layouts/Base.astro";
+import SchedaOggetto from "../components/SchedaOggetto.astro";
+import { getDisponibili, getVenduti } from "../lib/catalog";
+import { CATEGORIE } from "../lib/types";
+
+const disponibili = await getDisponibili();
+const venduti = await getVenduti();
+
+/* Mostriamo solo i filtri per categorie che hanno almeno un oggetto */
+const categoriePresenti = CATEGORIE.filter((c) =>
+  disponibili.some((o) => o.categoria === c)
+);
+---
+
+<Base
+  titolo="Catalogo"
+  descrizione="Il catalogo di HD Design: mobili, sedute, quadri e oggetti d'antiquariato disponibili in bottega."
+>
+  <section class="sezione">
+    <div class="contenitore">
+      <h1 class="titolo-sezione">Il catalogo</h1>
+      <p class="sottotitolo-sezione">
+        Tutti i pezzi disponibili in bottega in questo momento. Tocca una
+        categoria per restringere la scelta.
+      </p>
+
+      {
+        categoriePresenti.length > 1 && (
+          <div
+            class="filtri"
+            role="group"
+            aria-label="Filtra il catalogo per categoria"
+          >
+            <button class="filtro attivo" data-categoria="tutte" type="button">
+              Tutte
+            </button>
+            {categoriePresenti.map((categoria) => (
+              <button class="filtro" data-categoria={categoria} type="button">
+                {categoria}
+              </button>
+            ))}
+          </div>
+        )
+      }
+
+      <div class="griglia" id="griglia-catalogo">
+        {
+          disponibili.map((oggetto) => (
+            <div class="cella" data-categoria={oggetto.categoria}>
+              <SchedaOggetto oggetto={oggetto} />
+            </div>
+          ))
+        }
+      </div>
+
+      <p class="vuoto" id="messaggio-vuoto" hidden>
+        Nessun oggetto in questa categoria al momento. Torna a trovarci presto.
+      </p>
+    </div>
+  </section>
+
+  {
+    venduti.length > 0 && (
+      <section class="venduti">
+        <div class="contenitore">
+          <h2 class="venduti__titolo">Venduti di recente</h2>
+          <p class="venduti__testo">
+            Alcuni pezzi che hanno già trovato casa. Se ti piace questo genere
+            di oggetti, chiedici: spesso ne arrivano di simili.
+          </p>
+          <div class="venduti__griglia">
+            {venduti.map((oggetto) => (
+              <SchedaOggetto oggetto={oggetto} venduto />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+</Base>
+
+<script>
+  /* Filtro per categoria: mostra/nasconde le schede, senza ricaricare. */
+  const bottoni = document.querySelectorAll<HTMLButtonElement>(".filtro");
+  const celle = document.querySelectorAll<HTMLElement>(".cella");
+  const vuoto = document.getElementById("messaggio-vuoto");
+
+  bottoni.forEach((bottone) => {
+    bottone.addEventListener("click", () => {
+      const scelta = bottone.dataset.categoria;
+      bottoni.forEach((b) => b.classList.toggle("attivo", b === bottone));
+      let visibili = 0;
+      celle.forEach((cella) => {
+        const mostra = scelta === "tutte" || cella.dataset.categoria === scelta;
+        cella.hidden = !mostra;
+        if (mostra) visibili++;
+      });
+      if (vuoto) vuoto.hidden = visibili > 0;
+    });
+  });
+</script>
+
+<style>
+  .filtri {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+
+  .filtro {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--grigio);
+    background: transparent;
+    border: 1.5px solid var(--linea);
+    border-radius: 999px;
+    padding: 0.55rem 1.3rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .filtro:hover {
+    border-color: var(--grigio);
+    color: var(--inchiostro);
+  }
+
+  .filtro.attivo {
+    background: var(--inchiostro);
+    border-color: var(--inchiostro);
+    color: var(--carta);
+  }
+
+  .griglia {
+    margin-top: 2.5rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .vuoto {
+    margin-top: 2.5rem;
+    color: var(--grigio);
+    font-size: 1.15rem;
+  }
+
+  .venduti {
+    background: var(--sfondo-scuro);
+    border-top: 1px solid var(--linea);
+    padding-block: clamp(3rem, 7vw, 5rem);
+  }
+
+  .venduti__titolo {
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+  }
+
+  .venduti__testo {
+    color: var(--grigio);
+    max-width: 60ch;
+    margin-top: 0.4rem;
+  }
+
+  .venduti__griglia {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  @media (max-width: 900px) {
+    .griglia {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .venduti__griglia {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .griglia {
+      grid-template-columns: 1fr;
+    }
+
+    .venduti__griglia {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

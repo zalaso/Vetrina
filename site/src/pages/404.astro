@@ -1,0 +1,29 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base titolo="Pagina non trovata">
+  <section class="sezione">
+    <div class="contenitore centro">
+      <h1 class="titolo-sezione">Questa pagina non c'è più</h1>
+      <p class="sottotitolo-sezione centro__testo">
+        Forse l'oggetto che cercavi è stato venduto, o il collegamento è
+        vecchio. Dai un'occhiata al catalogo: trovi tutto quello che è in
+        bottega adesso.
+      </p>
+      <a class="bottone bottone--pieno" href="/catalogo/">Vai al catalogo</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .centro {
+    text-align: center;
+    padding-block: 3rem;
+  }
+
+  .centro__testo {
+    margin-inline: auto;
+    margin-bottom: 2rem;
+  }
+</style>

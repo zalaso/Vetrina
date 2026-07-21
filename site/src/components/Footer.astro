@@ -1,0 +1,82 @@
+---
+import Logo from "./Logo.astro";
+import { siteConfig } from "../config/site.config";
+
+const anno = new Date().getFullYear();
+---
+
+<footer class="fondo">
+  <div class="contenitore fondo__interno">
+    <div class="fondo__colonna">
+      <p class="fondo__marchio"><Logo dimensione="2.1rem" /></p>
+      <p class="fondo__testo">{siteConfig.slogan}</p>
+    </div>
+    <div class="fondo__colonna">
+      <p class="fondo__titolo">Contatti</p>
+      <p class="fondo__testo">{siteConfig.indirizzo}</p>
+      <p class="fondo__testo">
+        Tel. <a href={`tel:${siteConfig.telefono}`}>{siteConfig.telefonoVisibile}</a>
+      </p>
+    </div>
+    <div class="fondo__colonna">
+      <p class="fondo__titolo">Informazioni</p>
+      <p class="fondo__testo">{siteConfig.ragioneSociale}</p>
+      <p class="fondo__testo">P.IVA {siteConfig.partitaIva}</p>
+      <p class="fondo__testo">C.F. {siteConfig.codiceFiscale}</p>
+    </div>
+  </div>
+  <div class="contenitore fondo__riga">
+    <p>© {anno} {siteConfig.nomeAttivita}. Tutti i diritti riservati.</p>
+  </div>
+</footer>
+
+<style>
+  .fondo {
+    background: var(--inchiostro);
+    color: #c9c7c3;
+    margin-top: auto;
+  }
+
+  .fondo__interno {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 2.5rem;
+    padding-block: 3.5rem 2.5rem;
+  }
+
+  .fondo__marchio {
+    color: var(--sfondo);
+    margin-bottom: 0.9rem;
+  }
+
+  .fondo__titolo {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #8f8b84;
+    margin-bottom: 0.75rem;
+  }
+
+  .fondo__testo {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .fondo__testo a {
+    color: var(--sfondo);
+  }
+
+  .fondo__riga {
+    border-top: 1px solid #35332f;
+    padding-block: 1.4rem;
+    font-size: 0.9rem;
+    color: #8f8b84;
+  }
+
+  @media (max-width: 720px) {
+    .fondo__interno {
+      grid-template-columns: 1fr;
+      gap: 1.8rem;
+    }
+  }
+</style>

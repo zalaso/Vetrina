@@ -1,0 +1,18 @@
+{
+  "name": "hd-design-bot",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node --env-file=.env dev.js",
+    "set-webhook": "node --env-file=.env scripts/set-webhook.js",
+    "create-airtable-table": "node --env-file=.env scripts/create-airtable-table.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.70.0",
+    "grammy": "^1.30.0"
+  }
+}

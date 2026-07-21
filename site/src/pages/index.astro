@@ -1,0 +1,279 @@
+---
+import Base from "../layouts/Base.astro";
+import SchedaOggetto from "../components/SchedaOggetto.astro";
+import { siteConfig, whatsappLink } from "../config/site.config";
+import { getInEvidenza } from "../lib/catalog";
+
+const inEvidenza = await getInEvidenza(4);
+---
+
+<Base>
+  <!-- Hero -->
+  <section class="eroe">
+    <div class="contenitore eroe__griglia">
+      <div class="eroe__testo">
+        <h1 class="eroe__titolo">
+          Mobili e oggetti d'epoca,<br />
+          <em>scelti uno a uno.</em>
+        </h1>
+        <p class="eroe__frase">
+          Da {siteConfig.nomeAttivita} trovi arredi e oggetti d'antiquariato
+          selezionati con cura, pronti per entrare in casa tua.
+        </p>
+        <div class="eroe__azioni">
+          <a class="bottone bottone--pieno" href="/catalogo/">Sfoglia il catalogo</a>
+          <a class="bottone bottone--contorno" href="/contatti/">Vieni a trovarci</a>
+        </div>
+      </div>
+      <div class="eroe__foto">
+        <img
+          src="https://picsum.photos/seed/bottega-atmosfera/1000/1250"
+          alt="L'interno della bottega, con mobili e oggetti d'epoca"
+          width="1000"
+          height="1250"
+          fetchpriority="high"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- In evidenza -->
+  <section class="sezione">
+    <div class="contenitore">
+      <div class="evidenza__testata">
+        <div>
+          <h2 class="titolo-sezione">Pezzi in evidenza</h2>
+          <p class="sottotitolo-sezione">
+            Una piccola selezione di ciò che trovi ora in bottega.
+          </p>
+        </div>
+        <a class="evidenza__tutto" href="/catalogo/">Vedi tutto il catalogo</a>
+      </div>
+      <div class="evidenza__griglia">
+        {inEvidenza.map((oggetto) => <SchedaOggetto oggetto={oggetto} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- La bottega -->
+  <section class="bottega">
+    <div class="contenitore bottega__griglia">
+      <div class="bottega__foto">
+        <img
+          src="https://picsum.photos/seed/bottega-dettaglio/900/700"
+          alt="Un dettaglio della bottega"
+          loading="lazy"
+          width="900"
+          height="700"
+        />
+      </div>
+      <div class="bottega__testo">
+        <h2 class="titolo-sezione">Una bottega, non un magazzino</h2>
+        <p>
+          Ogni pezzo che vedi qui è passato per le nostre mani: scelto,
+          controllato e, quando serve, rimesso in ordine con rispetto per
+          la sua storia. Se cerchi qualcosa di particolare, chiedici:
+          spesso sappiamo dove trovarlo.
+        </p>
+        <p class="bottega__invito">
+          Il modo migliore per scegliere un mobile antico resta vederlo dal
+          vivo. Ti aspettiamo in negozio.
+        </p>
+        <a class="bottone bottone--contorno" href="/contatti/">Dove siamo e orari</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fascia contatto -->
+  <section class="fascia">
+    <div class="contenitore fascia__interno">
+      <h2 class="fascia__titolo">Hai visto qualcosa che ti piace?</h2>
+      <p class="fascia__testo">
+        Scrivici su WhatsApp o chiamaci: rispondiamo volentieri.
+      </p>
+      <div class="fascia__azioni">
+        <a class="bottone bottone--pieno" href={whatsappLink()}>
+          Scrivici su WhatsApp
+        </a>
+        <a class="fascia__telefono" href={`tel:${siteConfig.telefono}`}>
+          oppure chiama il {siteConfig.telefonoVisibile}
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* --- Hero -------------------------------------------------------------- */
+
+  .eroe {
+    border-bottom: 1px solid var(--linea);
+    background: linear-gradient(180deg, var(--carta) 0%, var(--sfondo) 100%);
+  }
+
+  .eroe__griglia {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    align-items: center;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    padding-block: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .eroe__titolo {
+    font-size: clamp(2.4rem, 5.2vw, 3.9rem);
+    line-height: 1.12;
+    padding-bottom: 0.25rem;
+  }
+
+  .eroe__titolo em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--accento);
+    line-height: 1.15;
+  }
+
+  .eroe__frase {
+    margin-top: 1.3rem;
+    font-size: 1.2rem;
+    color: var(--grigio);
+    max-width: 46ch;
+  }
+
+  .eroe__azioni {
+    margin-top: 2.2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .eroe__foto img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--raggio);
+    box-shadow: 0 24px 60px rgba(22, 21, 19, 0.16);
+  }
+
+  /* --- In evidenza -------------------------------------------------------- */
+
+  .evidenza__testata {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .evidenza__tutto {
+    white-space: nowrap;
+    font-weight: 500;
+    padding-bottom: 0.35rem;
+  }
+
+  .evidenza__griglia {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  /* --- La bottega ---------------------------------------------------------- */
+
+  .bottega {
+    background: var(--sfondo-scuro);
+    border-block: 1px solid var(--linea);
+    padding-block: clamp(3.5rem, 8vw, 6.5rem);
+  }
+
+  .bottega__griglia {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    align-items: center;
+    gap: clamp(2rem, 5vw, 4.5rem);
+  }
+
+  .bottega__foto img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--raggio);
+  }
+
+  .bottega__testo p {
+    margin-top: 1.2rem;
+    color: var(--grigio);
+    max-width: 58ch;
+  }
+
+  .bottega__invito {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.35rem;
+    color: var(--inchiostro);
+    line-height: 1.4;
+    padding-bottom: 0.2rem;
+  }
+
+  .bottega__testo .bottone {
+    margin-top: 2rem;
+  }
+
+  /* --- Fascia contatto ----------------------------------------------------- */
+
+  .fascia {
+    padding-block: clamp(3.5rem, 8vw, 6rem);
+    text-align: center;
+  }
+
+  .fascia__titolo {
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+  }
+
+  .fascia__testo {
+    margin-top: 0.8rem;
+    color: var(--grigio);
+  }
+
+  .fascia__azioni {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .fascia__telefono {
+    font-size: 1.0625rem;
+    color: var(--grigio);
+  }
+
+  /* --- Mobile -------------------------------------------------------------- */
+
+  @media (max-width: 900px) {
+    .eroe__griglia,
+    .bottega__griglia {
+      grid-template-columns: 1fr;
+    }
+
+    .eroe__foto {
+      order: -1;
+    }
+
+    .evidenza__griglia {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .bottega__foto {
+      order: -1;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .evidenza__griglia {
+      grid-template-columns: 1fr;
+    }
+
+    .evidenza__testata {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+</style>
