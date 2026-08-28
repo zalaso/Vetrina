@@ -1,230 +1,170 @@
-# HD Design — Catalogo, sito e bot Telegram
+# HD Design
 
-Sistema completo per la bottega d'antiquariato **HD Design**:
+**A catalogue and shop window for a small antique dealer, run entirely from Telegram.**
 
-- **`site/`** — sito vetrina pubblico (Astro), rigenerato automaticamente a ogni modifica del catalogo;
-- **`bot/`** — bot Telegram con cui il titolare gestisce il catalogo mandando foto e messaggi (anche vocali);
-- **Airtable** — il database condiviso che fa da catalogo e gestionale;
-- **Cloudinary** — l'archivio delle foto (in Airtable si salvano solo gli URL).
+[![CI](https://github.com/zalaso/HD-Design/actions/workflows/ci.yml/badge.svg)](https://github.com/zalaso/HD-Design/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
 
-Come si parlano i pezzi:
+The shopkeeper photographs a piece, says a few words about it, and taps a button.
+A minute later it is online, described in decent Italian, priced, and ready to be
+enquired about over WhatsApp. No dashboard, no login, no computer.
 
+Live instance: **[hd-design-alpha.vercel.app](https://hd-design-alpha.vercel.app)**
+· Operator's guide (Italian): **[docs/GUIDA.md](docs/GUIDA.md)**
+
+---
+
+## Why it exists
+
+This was built for an antique dealer in his seventies who does not use a computer
+and never will. Every off-the-shelf answer — a CMS, an e-commerce back office, a
+marketplace listing form — assumes someone willing to learn an interface. He isn't,
+and there is no reason he should be.
+
+He does, however, already send photos and voice messages to his family all day long.
+So the admin interface is a Telegram chat, and everything else is arranged behind it.
+
+The interesting constraint was not the technology. It was that **the person using it
+must never see an error, a form, or a decision they did not ask to make.** Every rule
+in the bot follows from that: confirmations are buttons rather than typed commands,
+failures are apologies rather than stack traces, and nothing changes the public site
+without an explicit tap.
+
+## How it works
+
+```mermaid
+flowchart LR
+    A["📱 Shopkeeper<br/>photo + voice note"] --> B["🤖 Telegram bot<br/>Node · grammY"]
+    B --> C["🧠 Claude<br/>extracts fields,<br/>writes descriptions"]
+    B --> D["🖼️ Cloudinary<br/>photo hosting"]
+    B --> E[("📋 Airtable<br/>catalogue")]
+    B -.->|deploy hook| F["▲ Vercel"]
+    F --> G["🌐 Static site<br/>Astro"]
+    E --> G
+    G --> H["👀 Customers<br/>→ WhatsApp"]
 ```
-Titolare ──(foto/messaggi)──▶ Bot Telegram ──▶ Airtable (tabella "Oggetti")
-                                   │                    ▲
-                                   └──(deploy hook)──▶ Vercel ricompila il sito
-                                                        │
-                              Sito Astro ◀──(legge in fase di build)┘
-```
 
----
+A message arrives as a Telegram webhook. Voice notes are transcribed with Whisper;
+the text and the photographs go to Claude, which returns structured fields plus a
+short and a long description written for a gallery, not for a marketplace. Photos go
+to Cloudinary, the record goes to Airtable, and a deploy hook rebuilds the site.
 
-## 1. Prerequisiti
+The public site is **fully static**. Airtable is read at build time, so a visitor's
+page load never depends on a third-party API being up, and the whole thing serves
+from a CDN.
 
-- Un account [Vercel](https://vercel.com) (gratuito)
-- Un account [Airtable](https://airtable.com) (gratuito)
-- Un account [Cloudinary](https://cloudinary.com) (piano free)
-- Una chiave API [Anthropic](https://console.anthropic.com) (per l'AI del bot)
-- Una chiave API [OpenAI](https://platform.openai.com) (solo per trascrivere i vocali)
-- [Node.js](https://nodejs.org) 20 o superiore sul tuo computer
+## What the shopkeeper can do
 
----
+Everything is plain Italian, typed or spoken, and every change is confirmed with a
+button before it happens.
 
-## 2. Creare il bot con BotFather
+| Says | Result |
+| --- | --- |
+| *photo* + "comò piemontese, pagato 400, lo vendo a 1200" | Draft with summary → ✅ Publish / ✏️ Correct |
+| "il prezzo è 1000, non 1200" | Corrects the draft in place |
+| "venduto il comò" | Marks **sold** — counts towards profit, shown in the "recently sold" gallery |
+| "togli la poltrona", "me la tengo", "si è rotta" | Marks **withdrawn** — disappears from the site, does *not* count as a sale |
+| "cambia la foto della credenza" | Waits for a new photo, replaces or appends |
+| "cosa ho in vendita?" | Short list with prices |
+| "quanto ho guadagnato quest'anno?" | Sum of (sale − purchase) for the year |
 
-1. Su Telegram cerca **@BotFather** e scrivi `/newbot`.
-2. Scegli un nome (es. "HD Design Catalogo") e uno username (es. `hddesign_catalogo_bot`).
-3. BotFather ti dà un **token** tipo `123456789:AAH...`: è il valore di `TELEGRAM_BOT_TOKEN`.
-4. Scopri l'**ID Telegram** del titolare (e il tuo): scrivete un messaggio a **@userinfobot**, che risponde con un numero. Quei numeri, separati da virgola, sono `ALLOWED_TELEGRAM_IDS`. Il bot ignora chiunque altro.
+Purchase prices and private notes live in Airtable and are never read by the site.
 
----
+## Stack
 
-## 3. Creare la base Airtable
+| | |
+| --- | --- |
+| **Site** | [Astro](https://astro.build) 5, static output, zero client JS except a category filter and a photo gallery |
+| **Bot** | Node 20, [grammY](https://grammy.dev), deployed as a serverless webhook |
+| **Database** | Airtable — chosen so the owner's family can also fix things in a spreadsheet-like UI |
+| **AI** | Anthropic Claude for parsing and copywriting, OpenAI Whisper for voice notes |
+| **Images** | Cloudinary (free tier), with automatic resizing |
+| **Hosting** | Vercel, two projects from one repository |
 
-1. Su Airtable crea una **base vuota** (es. "HD Design").
-2. Prendi l'**ID della base**: aprendo la base, l'URL è `https://airtable.com/appXXXXXXXXXXXXXX/...` — la parte che inizia con `app` è `AIRTABLE_BASE_ID`.
-3. Crea un **Personal Access Token** da <https://airtable.com/create/tokens> con questi scope sulla base:
-   - `data.records:read`
-   - `data.records:write`
-   - `schema.bases:write` (serve solo per lo script del punto 4, poi puoi revocarlo)
-
-   Il token è `AIRTABLE_API_KEY`.
-4. Crea la tabella **"Oggetti"** in automatico:
-
-   ```bash
-   cd bot
-   copy .env.example .env    # su Mac/Linux: cp .env.example .env
-   # compila nel file .env: AIRTABLE_API_KEY e AIRTABLE_BASE_ID
-   npm install
-   npm run create-airtable-table
-   ```
-
-   In alternativa puoi creare la tabella a mano, replicando esattamente questi campi:
-
-   | Campo | Tipo | Note |
-   |---|---|---|
-   | Nome | Testo | campo primario |
-   | ID | Autonumber | |
-   | Categoria | Single select | Mobili, Sedute, Quadri, Oggettistica, Illuminazione, Altro |
-   | Epoca | Testo | |
-   | Materiale | Testo | |
-   | Dimensioni | Testo | facoltativo, es. "L 120 × P 55 × H 98 cm" |
-   | Descrizione breve | Testo lungo | per la card del sito |
-   | Descrizione lunga | Testo lungo | per la pagina di dettaglio |
-   | Foto | Testo lungo | URL Cloudinary, uno per riga (li scrive il bot) |
-   | Prezzo di vendita | Numero | se vuoto il sito mostra "Prezzo su richiesta" |
-   | Prezzo di acquisto | Numero | **mai** esposto sul sito |
-   | Stato | Single select | Disponibile, Venduto, Bozza, Ritirato |
-   | Data inserimento | Data | |
-   | Data vendita | Data | |
-   | Note private | Testo lungo | |
-   | Chat | Testo | campo tecnico del bot |
-   | Fase | Testo | campo tecnico del bot |
-
-   Il prezzo di acquisto e le note private restano solo su Airtable: il sito non li legge mai.
-
-   **Significato degli stati:** `Disponibile` è in vetrina; `Venduto` compare nella sezione "Venduti di recente" e conta nel calcolo del guadagno; `Ritirato` è stato tolto dal catalogo *senza* essere venduto (tenuto, rotto o inserito per sbaglio) e non compare da nessuna parte né incide sui conti; `Bozza` è in lavorazione sul bot.
-
-5. Crea la tabella di servizio del bot:
-
-   ```bash
-   npm run aggiorna-airtable
-   ```
-
-   Aggiunge la tabella **Sessioni**, dove il bot tiene le operazioni in attesa di conferma. Serve perché su Vercel ogni messaggio può essere gestito da un'istanza diversa: senza questa tabella le conferme funzionerebbero in modo imprevedibile. Non va mai modificata a mano.
-
----
-
-## 4. Configurare Cloudinary
-
-1. Registrati su Cloudinary (piano free).
-2. Nella **Dashboard** trovi tre valori: **Cloud name**, **API Key**, **API Secret**.
-3. Sono, rispettivamente, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
-
-Le foto caricate dal bot finiscono nella cartella `hd-design`; il sito le richiede già ottimizzate (resize e compressione automatici di Cloudinary).
-
----
-
-## 5. Pubblicare il sito su Vercel
-
-1. Metti questo repository su GitHub.
-2. Su Vercel: **Add New → Project**, importa il repository e imposta **Root Directory = `site`** (framework: Astro, rilevato in automatico).
-3. Nelle **Environment Variables** del progetto aggiungi:
-   - `AIRTABLE_API_KEY`
-   - `AIRTABLE_BASE_ID`
-
-   (Senza queste variabili il sito compila comunque, con i dati di esempio.)
-4. Deploy. Il sito è online.
-5. Crea il **deploy hook**: Settings → Git → **Deploy Hooks** → crea un hook (es. "catalogo") sul branch principale. L'URL che ottieni è `VERCEL_DEPLOY_HOOK_URL`: ogni volta che il bot modifica il catalogo lo chiama e il sito si rigenera in ~1 minuto.
-6. Quando avrai il dominio definitivo, aggiorna `site` in [site/astro.config.mjs](site/astro.config.mjs) (serve per sitemap e meta tag).
-
-**Dati aziendali** (nome titolare, P.IVA, telefono, WhatsApp, indirizzo, orari, mappa): sono tutti in [site/src/config/site.config.ts](site/src/config/site.config.ts), segnati con `[DA COMPILARE]`. Compilali e fai un commit: non serve toccare altro.
-
----
-
-## 6. Pubblicare il bot su Vercel
-
-1. Su Vercel: **Add New → Project**, importa **lo stesso repository** una seconda volta e imposta **Root Directory = `bot`**.
-2. Nelle **Environment Variables** aggiungi tutte le variabili di [bot/.env.example](bot/.env.example):
-   `TELEGRAM_BOT_TOKEN`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `AIRTABLE_API_KEY`, `AIRTABLE_BASE_ID`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `VERCEL_DEPLOY_HOOK_URL`, `ALLOWED_TELEGRAM_IDS`.
-3. Deploy. Prendi nota dell'URL del progetto (es. `https://hd-design-bot.vercel.app`).
-4. Registra il **webhook** di Telegram (dal tuo computer, nella cartella `bot/` con il file `.env` compilato):
-
-   ```bash
-   # nel file .env imposta anche:
-   # WEBHOOK_URL=https://hd-design-bot.vercel.app/api/webhook
-   npm run set-webhook
-   ```
-
-5. Scrivi `/start` al bot su Telegram: se risponde con il messaggio di benvenuto, è tutto collegato.
-
----
-
-## 7. Come si usa il bot (per il titolare)
-
-- **Aggiungere un oggetto**: manda una o più foto con due parole di descrizione, scritte o a voce. Esempio: *"comò piemontese fine ottocento in noce, pagato quattrocento, lo vendo a milleduecento"*. Il bot prepara la scheda e chiede conferma con i bottoni **✅ Pubblica** / **✏️ Correggi**.
-- **Foto senza descrizione**: il bot chiede *"Che oggetto è?"* — basta rispondere, anche con un vocale.
-- **Correggere**: tocca **✏️ Correggi** e scrivi la correzione come viene, es. *"il prezzo è 1000, non 1200"*.
-- **Vendita**: scrivi *"venduto il comò"*. Il bot mostra la foto dell'oggetto e chiede **✅ È questo** / **❌ No, un altro**.
-- **Togliere senza vendere**: *"togli la poltrona"*, *"me la tengo"*, *"si è rotta"*. Il pezzo passa in **Ritirato**: sparisce dal sito ma non risulta venduto e non entra nel calcolo del guadagno.
-- **Cambiare un prezzo o un dato**: *"il comò ora costa 1000"*, *"la credenza è del Settecento"*, stessa conferma con bottoni.
-- **Cambiare una foto**: *"cambia la foto del comò"* (sostituisce) oppure *"aggiungi una foto alla credenza"* (aggiunge). Dopo la conferma il bot resta in attesa della foto nuova.
-- **Consultare**: *"cosa ho in vendita?"* oppure *"quanto ho guadagnato quest'anno?"*.
-
-Nessuna modifica al catalogo avviene senza una conferma esplicita con i bottoni.
-
----
-
-## 8. Sviluppo in locale
-
-**Sito** (usa i dati mock se mancano le variabili Airtable):
+## Quick start
 
 ```bash
-cd site
-npm install
-npm run dev        # http://localhost:4321
-```
-
-**Bot** (in modalità polling, senza webhook):
-
-```bash
-cd bot
+git clone https://github.com/zalaso/HD-Design.git
+cd HD-Design/site
 npm install
 npm run dev
 ```
 
-Nota: il polling locale sospende il webhook; quando hai finito, ripristinalo con `npm run set-webhook`.
+Open <http://localhost:4321>. With no configuration at all you get a **fictional
+example shop** with a sample catalogue — enough to see the whole site working before
+you connect anything.
 
----
+To make it your own, copy `site/.env.example` to `site/.env` and set `SHOP_NAME`.
+Setting it switches the site out of example mode: from that point fields you leave
+empty stay empty rather than inheriting the fictional shop's details.
 
-## 9. Se il sito non si aggiorna
+Setting up the bot takes longer — Telegram, Airtable, Cloudinary and two API keys.
+That is what [docs/GUIDA.md](docs/GUIDA.md) walks through, step by step.
 
-Se pubblichi un oggetto dal bot e sul sito non compare, controlla in quest'ordine:
+## Configuration
 
-1. **L'oggetto è su Airtable con Stato "Disponibile"?** Se no, il problema è nel bot.
-2. **Su Vercel, progetto del sito → Deployments: ci sono build recenti e sono verdi?**
-   - Build **Error** → apri il registro e leggi il motivo.
-   - **Nessuna build** dopo una modifica → il deploy non è stato nemmeno avviato: vedi il punto 3.
-3. **Deployment bloccati con il messaggio *"the commit author did not have contributing access"***.
-   Succede quando l'autore dei commit non corrisponde all'account Vercel. Sul piano
-   gratuito Vercel rifiuta i commit di un utente diverso dal proprietario su
-   repository privati.
+No business data is committed to this repository. The code is the engine; a shop is
+an environment. Full reference with comments in
+[`site/.env.example`](site/.env.example) and [`bot/.env.example`](bot/.env.example).
 
-   Questo repository è impostato per usare l'identità dell'account **zalaso**:
+**Site** — `SHOP_NAME` is the switch; `SHOP_PHONE`, `SHOP_PHONE_DISPLAY` and
+`SHOP_WHATSAPP` are then required (the build fails loudly without them, which on
+Vercel means the previous deployment stays up instead of a site with broken contact
+buttons). Everything else is optional and simply hides itself: no address means no
+address block and no map, no biography means the "story" page drops out of the menu
+and is marked `noindex`.
 
-   ```bash
-   git config user.name   # zalaso
-   git config user.email  # 255437588+zalaso@users.noreply.github.com
-   ```
+**Bot** — Telegram token, Anthropic key, Airtable credentials, Cloudinary
+credentials, the Vercel deploy hook, and `ALLOWED_TELEGRAM_IDS`, a whitelist of
+Telegram user IDs. Anyone else gets a flat "Bot privato". The OpenAI key is optional
+and only enables voice notes — worth having, since speaking is easier than typing for
+the intended user.
 
-   Se hai clonato il progetto su un altro computer, ripeti quei due comandi con
-   `git config user.name "zalaso"` e
-   `git config user.email "255437588+zalaso@users.noreply.github.com"`,
-   altrimenti Git userebbe l'indirizzo globale (`guidomarmorini@gmail.com`), che
-   GitHub associa a un account diverso e Vercel rifiuta.
+## Deployment
 
-   Per lo stesso motivo, **non aggiungere righe `Co-Authored-By:` ai commit**: Vercel
-   le legge come un secondo contributore e blocca la pubblicazione.
+Two Vercel projects from this one repository, with **Root Directory** set to `site`
+and `bot` respectively. The bot's `VERCEL_DEPLOY_HOOK_URL` points at the site
+project, which is what closes the loop between "publish" and the page going live.
 
-4. **Il deploy hook punta al progetto giusto?** L'URL contiene l'identificativo del
-   progetto (`.../deploy/prj_XXXX/...`): deve coincidere con il **Project ID** che
-   trovi in Settings → General del progetto del **sito**, non del bot.
+> **A trap worth knowing:** on Vercel's free plan with a private repository,
+> deployments are silently rejected when the commit author is not the project owner —
+> the site keeps serving the previous build with no visible error. If pushes stop
+> taking effect, check that `git config user.email` matches the GitHub account that
+> owns the Vercel project.
 
-## 10. Struttura del repository
+## Running costs
+
+Everything except the AI runs on free tiers. Per operation, roughly:
+
+| | |
+| --- | --- |
+| Add an item (photos analysed + descriptions written) | ~€0.02 |
+| Corrections, sales, queries | < €0.01 |
+| Transcribe a voice note | ~€0.002 |
+
+For a shop adding 30 pieces a month that is **under €2/month**, and Airtable,
+Cloudinary and Vercel stay free at this scale.
+
+## Project layout
 
 ```
-├── site/                    Sito vetrina (Astro)
-│   ├── src/config/site.config.ts   Dati aziendali [DA COMPILARE]
-│   ├── src/lib/catalog.ts          Accesso al catalogo (mock o Airtable)
-│   ├── src/lib/airtable.ts         Lettura da Airtable in fase di build
-│   ├── src/data/mock.ts            Dati di esempio per lo sviluppo
-│   └── src/pages/                  Home, Catalogo, Dettaglio, Contatti
-└── bot/                     Bot Telegram (Node + grammY, webhook su Vercel)
-    ├── api/webhook.js              Entry point serverless
-    ├── src/bot.js                  Flussi conversazionali
-    ├── src/ai.js                   Interpretazione messaggi (Anthropic)
-    ├── src/transcribe.js           Trascrizione vocali (Whisper)
-    ├── src/cloudinary.js           Caricamento foto
-    ├── src/airtable.js             Lettura/scrittura catalogo
-    └── scripts/                    Setup: tabella Airtable, webhook
+site/                     Astro shop window
+  src/config/             the shop as configuration, read from the environment
+  src/lib/catalog.ts      single entry point for data — Airtable, or sample data
+  src/pages/              home · catalogue · item · story · contact
+bot/                      Telegram bot
+  api/webhook.js          serverless entry point
+  src/bot.js              conversation flows and confirmations
+  src/ai.js               prompts for extraction, correction, intent
+  src/sessions.js         pending confirmations, stored in Airtable rather than
+                          in memory — serverless instances do not share memory
+  scripts/                one-off setup: Airtable schema, Telegram webhook
+docs/GUIDA.md             setup and day-to-day guide, in Italian
 ```
+
+The code, comments and UI strings are in Italian: it is the language of the shop and
+of the person the software was written for.
+
+## License
+
+[MIT](LICENSE) © Guido Marmorini

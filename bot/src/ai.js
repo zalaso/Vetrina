@@ -49,7 +49,7 @@ async function chiedi(system, contenutoUtente) {
  * dell'oggetto e genera le descrizioni per il sito.
  */
 export async function estraiOggetto(testo, fotoUrls = []) {
-  const system = `Sei l'assistente di HD Design, una bottega di antiquariato italiana.
+  const system = `Sei l'assistente di ${config.shopName}, una bottega di antiquariato italiana.
 Dal messaggio del titolare (e dalle foto, se presenti) estrai i dati di un oggetto in vendita.
 Rispondi SOLO con un JSON con questi campi (usa null se un dato non c'è):
 {
@@ -79,7 +79,7 @@ I numeri detti a voce possono essere in lettere ('quattrocento' = 400).`;
  * Applica una correzione in linguaggio naturale ai campi già estratti.
  */
 export async function applicaCorrezione(campiAttuali, testoCorrezione) {
-  const system = `Sei l'assistente di HD Design (bottega di antiquariato italiana).
+  const system = `Sei l'assistente di ${config.shopName} (bottega di antiquariato italiana).
 Il titolare vuole correggere i dati di un oggetto. Ti do i dati attuali e la sua richiesta.
 Rispondi SOLO con il JSON completo dei dati aggiornati, stesso formato di quello ricevuto:
 cambia solo ciò che chiede, mantieni il resto identico. Se cambia un dato citato nelle
@@ -105,7 +105,7 @@ export async function interpretaComando(testo, oggetti) {
 
   const annoCorrente = new Date().getFullYear();
 
-  const system = `Sei l'assistente di HD Design (bottega di antiquariato italiana).
+  const system = `Sei l'assistente di ${config.shopName} (bottega di antiquariato italiana).
 Il titolare gestisce il catalogo scrivendo frasi libere. Interpreta la sua richiesta.
 Rispondi SOLO con un JSON:
 {

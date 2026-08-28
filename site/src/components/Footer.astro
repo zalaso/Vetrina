@@ -10,7 +10,7 @@ const mostraIndirizzo = compilato(siteConfig.indirizzo);
   <div class="contenitore fondo__interno">
     <div class="fondo__colonna">
       <p class="fondo__marchio"><Logo dimensione="2.1rem" /></p>
-      <p class="fondo__testo">{siteConfig.slogan}</p>
+      {compilato(siteConfig.slogan) && <p class="fondo__testo">{siteConfig.slogan}</p>}
     </div>
     <div class="fondo__colonna">
       <p class="fondo__titolo">Contatti</p>
@@ -21,8 +21,16 @@ const mostraIndirizzo = compilato(siteConfig.indirizzo);
     </div>
     <div class="fondo__colonna">
       <p class="fondo__titolo">Informazioni</p>
-      <p class="fondo__testo">{siteConfig.ragioneSociale}</p>
-      <p class="fondo__testo">P.IVA {siteConfig.partitaIva}</p>
+      {
+        compilato(siteConfig.ragioneSociale) && (
+          <p class="fondo__testo">{siteConfig.ragioneSociale}</p>
+        )
+      }
+      {
+        compilato(siteConfig.partitaIva) && (
+          <p class="fondo__testo">P.IVA {siteConfig.partitaIva}</p>
+        )
+      }
     </div>
   </div>
   <div class="contenitore fondo__riga">

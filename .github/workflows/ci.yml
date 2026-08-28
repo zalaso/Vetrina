@@ -1,0 +1,55 @@
+# Controllo automatico a ogni modifica: il sito deve compilare e il codice del
+# bot deve essere sintatticamente valido. Nessun segreto è richiesto — il sito
+# si compila in modalità esempio, con la bottega e il catalogo di fantasia.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  site:
+    name: Compilazione del sito
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Installa le dipendenze
+        working-directory: site
+        run: npm ci
+
+      - name: Compila (modalità esempio)
+        working-directory: site
+        run: npm run build
+
+  bot:
+    name: Controllo del bot
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: bot/package-lock.json
+
+      - name: Installa le dipendenze
+        working-directory: bot
+        run: npm ci
+
+      - name: Controlla la sintassi di ogni modulo
+        working-directory: bot
+        run: |
+          for file in $(find src api scripts dev.js -name '*.js'); do
+            node --check "$file"
+          done

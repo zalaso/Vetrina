@@ -11,6 +11,12 @@ function obbligatoria(nome) {
 }
 
 export const config = {
+  /**
+   * Nome della bottega: compare nelle istruzioni date all'AI, così le
+   * descrizioni generate parlano del negozio giusto.
+   */
+  shopName: process.env.SHOP_NAME?.trim() || "la bottega",
+
   telegramToken: obbligatoria("TELEGRAM_BOT_TOKEN"),
   anthropicApiKey: obbligatoria("ANTHROPIC_API_KEY"),
   openaiApiKey: process.env.OPENAI_API_KEY ?? "",
