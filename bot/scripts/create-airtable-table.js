@@ -21,7 +21,7 @@ const scelte = (nomi) => ({ choices: nomi.map((name) => ({ name })) });
 
 const tabella = {
   name: "Oggetti",
-  description: "Catalogo HD Design, gestito dal bot Telegram",
+  description: "Catalogo del negozio, gestito dal bot Telegram",
   fields: [
     // Il primo campo è il campo primario.
     // Nota: il campo "ID" (Autonumber) NON si può creare via API;

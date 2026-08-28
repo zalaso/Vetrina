@@ -27,6 +27,15 @@ function testo(valore: unknown, esempio: string): string {
   return modalitaEsempio ? esempio : "";
 }
 
+/**
+ * Valore con ripiego sempre attivo, anche fuori dalla modalità esempio.
+ * Serve per i dati ricavati da altri (marchio, descrizione), che non possono
+ * restare vuoti perché il sito li usa comunque.
+ */
+function valore(v: unknown, predefinito: string): string {
+  return typeof v === "string" && v.trim() ? v.trim() : predefinito;
+}
+
 /** Lista separata da "|" (es. gli orari), stessa regola del testo */
 function lista(valore: unknown, esempio: string[]): string[] {
   if (typeof valore === "string" && valore.trim()) {
@@ -41,6 +50,18 @@ function lista(valore: unknown, esempio: string[]): string[] {
 export interface SiteConfig {
   /** Nome dell'attività, usato in titoli e intestazioni */
   nomeAttivita: string;
+  /** Descrizione per i motori di ricerca e le anteprime di condivisione */
+  descrizione: string;
+  /**
+   * Il marchio disegnato dal sito: un monogramma grande in serif con una
+   * parola spaziata sotto. Di norma si ricava dal nome dell'attività
+   * ("Bottega del Ponte" → "HD" sopra, "Design" sotto); si può forzare con
+   * SHOP_LOGO_MONOGRAM e SHOP_LOGO_WORD.
+   */
+  logo: {
+    monogramma: string;
+    parola: string;
+  };
   /** Frase breve mostrata nel footer */
   slogan: string;
   /** Nome e cognome del titolare */
@@ -73,8 +94,27 @@ export interface SiteConfig {
   };
 }
 
+const nomeAttivita = testo(import.meta.env.SHOP_NAME, "Bottega del Ponte");
+
+/* Il marchio si ricava dal nome: la prima parola diventa il monogramma
+   grande, le altre la riga spaziata sotto. */
+const [primaParola = nomeAttivita, ...restoDelNome] = nomeAttivita
+  .split(/\s+/)
+  .filter(Boolean);
+
 export const siteConfig: SiteConfig = {
-  nomeAttivita: testo(import.meta.env.SHOP_NAME, "Bottega del Ponte"),
+  nomeAttivita,
+
+  descrizione: valore(
+    import.meta.env.SHOP_DESCRIPTION,
+    `${nomeAttivita}: mobili, sedute, quadri e oggetti d'antiquariato scelti ` +
+      "con cura. Vieni a trovarci in negozio o scrivici su WhatsApp."
+  ),
+
+  logo: {
+    monogramma: valore(import.meta.env.SHOP_LOGO_MONOGRAM, primaParola),
+    parola: valore(import.meta.env.SHOP_LOGO_WORD, restoDelNome.join(" ")),
+  },
 
   slogan: testo(
     import.meta.env.SHOP_TAGLINE,

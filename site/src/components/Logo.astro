@@ -1,26 +1,29 @@
 ---
 /**
- * Lockup tipografico del marchio HD Design: monogramma "HD" in serif
- * con "DESIGN" spaziato sotto, come nel logo fornito dal cliente.
- * Eredita il colore dal contesto (currentColor), così funziona
- * sia su fondo chiaro sia nel footer scuro.
+ * Il marchio disegnato con la tipografia del sito: monogramma grande in
+ * serif con una parola spaziata sotto.
  *
- * Se in futuro si vuole usare il file originale del logo, basta
- * metterlo in /public (es. logo.svg) e sostituire questo componente
- * con un <img>.
+ * Non è un'immagine: si ricava dal nome dell'attività, così ogni bottega ha
+ * il proprio senza dover fornire un file. Vedi `logo` in site.config.ts.
+ *
+ * Per usare un logo vero, metti il file in `public/` e sostituisci il
+ * contenuto di questo componente con un `<img>`.
  */
+import { siteConfig } from "../config/site.config";
+
 interface Props {
-  /** Dimensione del monogramma, es. "1.9rem" (default) o "2.6rem" */
+  /** Dimensione del monogramma, es. "1.9rem" (predefinita) o "2.6rem" */
   dimensione?: string;
 }
 
 const { dimensione = "1.9rem" } = Astro.props;
+const { monogramma, parola } = siteConfig.logo;
 ---
 
 <span class="logo" style={`--logo-dimensione: ${dimensione}`}>
-  <span class="logo__hd" aria-hidden="true">HD</span>
-  <span class="logo__design" aria-hidden="true">Design</span>
-  <span class="visivamente-nascosto">HD Design</span>
+  <span class="logo__monogramma" aria-hidden="true">{monogramma}</span>
+  {parola && <span class="logo__parola" aria-hidden="true">{parola}</span>}
+  <span class="visivamente-nascosto">{siteConfig.nomeAttivita}</span>
 </span>
 
 <style>
@@ -32,21 +35,23 @@ const { dimensione = "1.9rem" } = Astro.props;
     color: inherit;
   }
 
-  .logo__hd {
+  .logo__monogramma {
     font-family: var(--serif);
     font-weight: 500;
     font-size: var(--logo-dimensione);
-    letter-spacing: -0.06em;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
   }
 
-  .logo__design {
+  .logo__parola {
     font-family: var(--sans);
     font-weight: 400;
     font-size: calc(var(--logo-dimensione) * 0.26);
     letter-spacing: 0.52em;
     text-transform: uppercase;
+    white-space: nowrap;
     margin-top: 0.35em;
-    /* compensa lo spazio finale del letter-spacing per centrare davvero */
+    /* compensa lo spazio finale del letter-spacing, per centrare davvero */
     margin-right: -0.52em;
   }
 

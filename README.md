@@ -1,15 +1,16 @@
-# HD Design
+# Vetrina
 
-**A catalogue and shop window for a small antique dealer, run entirely from Telegram.**
+**A catalogue and shop window for a small shop, run entirely from Telegram.**
 
-[![CI](https://github.com/zalaso/HD-Design/actions/workflows/ci.yml/badge.svg)](https://github.com/zalaso/HD-Design/actions/workflows/ci.yml)
+[![CI](https://github.com/zalaso/Vetrina/actions/workflows/ci.yml/badge.svg)](https://github.com/zalaso/Vetrina/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
 
 The shopkeeper photographs a piece, says a few words about it, and taps a button.
 A minute later it is online, described in decent Italian, priced, and ready to be
 enquired about over WhatsApp. No dashboard, no login, no computer.
 
-Live instance: **[hd-design-alpha.vercel.app](https://hd-design-alpha.vercel.app)**
+Running in production for **HD Design**, an Italian antique dealer:
+**[hd-design-alpha.vercel.app](https://hd-design-alpha.vercel.app)**
 · Operator's guide (Italian): **[docs/GUIDA.md](docs/GUIDA.md)**
 
 ---
@@ -84,8 +85,8 @@ Purchase prices and private notes live in Airtable and are never read by the sit
 ## Quick start
 
 ```bash
-git clone https://github.com/zalaso/HD-Design.git
-cd HD-Design/site
+git clone https://github.com/zalaso/Vetrina.git
+cd Vetrina/site
 npm install
 npm run dev
 ```
@@ -113,6 +114,11 @@ Vercel means the previous deployment stays up instead of a site with broken cont
 buttons). Everything else is optional and simply hides itself: no address means no
 address block and no map, no biography means the "story" page drops out of the menu
 and is marked `noindex`.
+
+The wordmark and favicon are drawn from `SHOP_NAME` rather than shipped as
+files, so a fresh clone has its own identity immediately: "HD Design" becomes a
+large serif **HD** over a spaced **DESIGN**. Drop in a real logo by replacing
+`Logo.astro` with an `<img>`.
 
 **Bot** — Telegram token, Anthropic key, Airtable credentials, Cloudinary
 credentials, the Vercel deploy hook, and `ALLOWED_TELEGRAM_IDS`, a whitelist of

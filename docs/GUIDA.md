@@ -1,4 +1,4 @@
-# Guida a HD Design
+# Guida a Vetrina
 
 Guida pratica in italiano: come installare il sistema da zero, come si usa tutti i
 giorni, e cosa guardare quando qualcosa non va.
@@ -61,7 +61,7 @@ Sul computer serve [Node.js](https://nodejs.org) 20 o superiore.
 ## 3. Creare il bot su Telegram
 
 1. Su Telegram cerca **@BotFather** e scrivi `/newbot`.
-2. Scegli un nome (es. "HD Design") e uno username che finisca per `bot`.
+2. Scegli un nome (quello del negozio) e uno username che finisca per `bot`.
 3. BotFather risponde con un **token** tipo `123456789:AAH...`: è
    `TELEGRAM_BOT_TOKEN`.
 4. Servono poi gli **ID Telegram** delle persone autorizzate. Ognuna, dal proprio
@@ -135,7 +135,8 @@ indirizzi di quelli già online.
 Registrati e prendi dalla Dashboard **Cloud name**, **API Key** e **API Secret**:
 sono `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
 
-Le foto finiscono nella cartella `hd-design` e il sito le richiede già
+Le foto finiscono nella cartella indicata da `CLOUDINARY_FOLDER`
+(`vetrina` se non la imposti) e il sito le richiede già
 ridimensionate e compresse.
 
 ---
@@ -209,6 +210,8 @@ motori di ricerca.
 | Variabile | |
 |---|---|
 | `SHOP_TAGLINE` | frase breve nel footer |
+| `SHOP_DESCRIPTION` | descrizione per i motori di ricerca |
+| `SHOP_LOGO_MONOGRAM` · `SHOP_LOGO_WORD` | forzano il marchio, che di norma si ricava dal nome |
 | `SHOP_OWNER` · `SHOP_LEGAL_NAME` · `SHOP_VAT` | titolare, ragione sociale, P.IVA |
 | `SHOP_ADDRESS` | via, civico, CAP, città — **genera la mappa da sola** |
 | `SHOP_HOURS` | orari, righe separate da `\|` |
@@ -216,6 +219,12 @@ motori di ricerca.
 | `SHOP_STORY_PARAGRAPHS` | biografia, paragrafi separati da `\|` |
 | `SHOP_STORY_TITLE` · `SHOP_STORY_ROLE` · `SHOP_STORY_QUOTE` | titolo, qualifica, frase in evidenza |
 | `SHOP_STORY_PHOTO` | es. `/titolare.jpg`, con la foto dentro `site/public/` |
+
+**Il marchio si disegna da solo.** Il logo in cima al sito e la favicon si
+ricavano dal nome: "HD Design" diventa una **HD** grande in serif con
+**DESIGN** spaziato sotto. Se il nome è di una parola sola resta solo quella.
+Per un logo tuo, metti il file in `site/public/` e sostituisci il contenuto di
+`site/src/components/Logo.astro` con un `<img>`.
 
 Esempio per gli orari:
 

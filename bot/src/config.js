@@ -26,6 +26,8 @@ export const config = {
     cloudName: obbligatoria("CLOUDINARY_CLOUD_NAME"),
     apiKey: obbligatoria("CLOUDINARY_API_KEY"),
     apiSecret: obbligatoria("CLOUDINARY_API_SECRET"),
+    /** Cartella in cui finiscono le foto caricate dal bot */
+    folder: process.env.CLOUDINARY_FOLDER?.trim() || "vetrina",
   },
   deployHookUrl: process.env.VERCEL_DEPLOY_HOOK_URL ?? "",
   /** ID Telegram autorizzati (numeri) */

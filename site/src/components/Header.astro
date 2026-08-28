@@ -1,6 +1,6 @@
 ---
 import Logo from "./Logo.astro";
-import { storiaCompilata } from "../config/site.config";
+import { siteConfig, storiaCompilata } from "../config/site.config";
 
 const percorso = Astro.url.pathname;
 
@@ -23,7 +23,7 @@ function attiva(href: string): boolean {
 
 <header class="testata">
   <div class="contenitore testata__interno">
-    <a href="/" class="testata__marchio" aria-label="HD Design, torna alla home">
+    <a href="/" class="testata__marchio" aria-label={`${siteConfig.nomeAttivita}, torna alla home`}>
       <Logo dimensione="2rem" />
     </a>
     <nav aria-label="Navigazione principale">

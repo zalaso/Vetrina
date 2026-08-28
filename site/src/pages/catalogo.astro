@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import SchedaOggetto from "../components/SchedaOggetto.astro";
+import { siteConfig } from "../config/site.config";
 import { getDisponibili, getVenduti } from "../lib/catalog";
 import { CATEGORIE } from "../lib/types";
 
@@ -15,7 +16,7 @@ const categoriePresenti = CATEGORIE.filter((c) =>
 
 <Base
   titolo="Catalogo"
-  descrizione="Il catalogo di HD Design: mobili, sedute, quadri e oggetti d'antiquariato disponibili in bottega."
+  descrizione={`Il catalogo di ${siteConfig.nomeAttivita}: mobili, sedute, quadri e oggetti d'antiquariato disponibili in bottega.`}
 >
   <section class="sezione">
     <div class="contenitore">

@@ -8,7 +8,7 @@ import { config } from "./config.js";
 export async function caricaFoto(buffer, nomeFile = "foto.jpg") {
   const { cloudName, apiKey, apiSecret } = config.cloudinary;
   const timestamp = Math.floor(Date.now() / 1000);
-  const folder = "hd-design";
+  const folder = config.cloudinary.folder;
 
   // Firma: sha1 dei parametri ordinati + api_secret
   const daFirmare = `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
