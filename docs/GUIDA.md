@@ -4,6 +4,7 @@ Guida pratica in italiano: come installare il sistema da zero, come si usa tutti
 giorni, e cosa guardare quando qualcosa non va.
 
 Per la descrizione del progetto in generale, vedi il [README](../README.md).
+This guide is also available [in English](SETUP.md).
 
 ---
 

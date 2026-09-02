@@ -11,7 +11,7 @@ enquired about over WhatsApp. No dashboard, no login, no computer.
 
 Running in production for **HD Design**, an Italian antique dealer:
 **[hd-design-alpha.vercel.app](https://hd-design-alpha.vercel.app)**
-· Operator's guide (Italian): **[docs/GUIDA.md](docs/GUIDA.md)**
+· Setup and operation: **[English](docs/SETUP.md)** · **[Italiano](docs/GUIDA.md)**
 
 ---
 
@@ -100,7 +100,7 @@ Setting it switches the site out of example mode: from that point fields you lea
 empty stay empty rather than inheriting the fictional shop's details.
 
 Setting up the bot takes longer — Telegram, Airtable, Cloudinary and two API keys.
-That is what [docs/GUIDA.md](docs/GUIDA.md) walks through, step by step.
+That is what [docs/SETUP.md](docs/SETUP.md) walks through, step by step.
 
 ## Configuration
 
@@ -165,11 +165,13 @@ bot/                      Telegram bot
   src/sessions.js         pending confirmations, stored in Airtable rather than
                           in memory — serverless instances do not share memory
   scripts/                one-off setup: Airtable schema, Telegram webhook
-docs/GUIDA.md             setup and day-to-day guide, in Italian
+docs/SETUP.md             setup and day-to-day guide (English)
+docs/GUIDA.md             the same guide in Italian, for the shopkeeper
 ```
 
 The code, comments and UI strings are in Italian: it is the language of the shop and
-of the person the software was written for.
+of the person the software was written for. The documentation is in both languages,
+and every configuration variable is named in English.
 
 ## License
 
