@@ -222,8 +222,8 @@ motori di ricerca.
 | `SHOP_STORY_PHOTO` | es. `/titolare.jpg`, con la foto dentro `site/public/` |
 
 **Il marchio si disegna da solo.** Il logo in cima al sito e la favicon si
-ricavano dal nome: "HD Design" diventa una **HD** grande in serif con
-**DESIGN** spaziato sotto. Se il nome è di una parola sola resta solo quella.
+ricavano dal nome: "Bottega del Ponte" diventa un **Bottega** grande in serif con
+**DEL PONTE** spaziato sotto. Se il nome è di una parola sola resta solo quella.
 Per un logo tuo, metti il file in `site/public/` e sostituisci il contenuto di
 `site/src/components/Logo.astro` con un `<img>`.
 

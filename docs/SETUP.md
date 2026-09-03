@@ -221,8 +221,8 @@ drops out of the menu and is marked `noindex`.
 | `SHOP_STORY_PHOTO` | e.g. `/owner.jpg`, with the file in `site/public/` |
 
 **The wordmark draws itself.** The logo at the top of the site and the favicon are
-derived from the name: "HD Design" becomes a large serif **HD** with **DESIGN**
-spaced underneath. A one-word name leaves just the word. For a real logo, put the
+derived from the name: "Bottega del Ponte" becomes a large serif **Bottega** with
+**DEL PONTE** spaced underneath. A one-word name leaves just the word. For a real logo, put the
 file in `site/public/` and replace the contents of
 `site/src/components/Logo.astro` with an `<img>`.
 

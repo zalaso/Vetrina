@@ -9,20 +9,28 @@ The shopkeeper photographs a piece, says a few words about it, and taps a button
 A minute later it is online, described in decent Italian, priced, and ready to be
 enquired about over WhatsApp. No dashboard, no login, no computer.
 
-Running in production for **HD Design**, an Italian antique dealer:
-**[hd-design-alpha.vercel.app](https://hd-design-alpha.vercel.app)**
-· Setup and operation: **[English](docs/SETUP.md)** · **[Italiano](docs/GUIDA.md)**
+Setup and operation: **[English](docs/SETUP.md)** · **[Italiano](docs/GUIDA.md)**
 
 ---
 
+## Who it is for
+
+Shops whose owner will not use a back office, and shouldn't have to: antique
+dealers, second-hand furniture, small galleries, one-person workshops — anywhere the
+stock is photographed one piece at a time and sold by conversation rather than by
+checkout.
+
+Clone it and run `npm run dev`: you get a complete example shop, with a sample
+catalogue, before connecting anything.
+
 ## Why it exists
 
-This was built for an antique dealer in his seventies who does not use a computer
+It was written for an antique dealer in his seventies who does not use a computer
 and never will. Every off-the-shelf answer — a CMS, an e-commerce back office, a
-marketplace listing form — assumes someone willing to learn an interface. He isn't,
-and there is no reason he should be.
+marketplace listing form — assumes someone willing to learn an interface. He wasn't,
+and there was no reason he should be.
 
-He does, however, already send photos and voice messages to his family all day long.
+He did, however, already send photos and voice messages to his family all day long.
 So the admin interface is a Telegram chat, and everything else is arranged behind it.
 
 The interesting constraint was not the technology. It was that **the person using it
@@ -116,9 +124,9 @@ address block and no map, no biography means the "story" page drops out of the m
 and is marked `noindex`.
 
 The wordmark and favicon are drawn from `SHOP_NAME` rather than shipped as
-files, so a fresh clone has its own identity immediately: "HD Design" becomes a
-large serif **HD** over a spaced **DESIGN**. Drop in a real logo by replacing
-`Logo.astro` with an `<img>`.
+files, so a fresh clone has its own identity immediately: "Bottega del Ponte"
+becomes a large serif **Bottega** over a spaced **DEL PONTE**. Drop in a real logo
+by replacing `Logo.astro` with an `<img>`.
 
 **Bot** — Telegram token, Anthropic key, Airtable credentials, Cloudinary
 credentials, the Vercel deploy hook, and `ALLOWED_TELEGRAM_IDS`, a whitelist of
@@ -169,9 +177,17 @@ docs/SETUP.md             setup and day-to-day guide (English)
 docs/GUIDA.md             the same guide in Italian, for the shopkeeper
 ```
 
-The code, comments and UI strings are in Italian: it is the language of the shop and
-of the person the software was written for. The documentation is in both languages,
-and every configuration variable is named in English.
+## A note on language
+
+The code, comments and interface are in Italian — the language of the shop it was
+written for. Documentation is in both languages and every configuration variable is
+named in English, so you can run it as-is for an Italian-speaking shop without
+reading a line of Italian.
+
+To run it in another language you need to translate three things, and nothing else:
+the prompts in `bot/src/ai.js`, the bot's replies in `bot/src/bot.js`, and the page
+text in `site/src/pages/`. The Airtable field names are read by the bot by name and
+should stay as they are.
 
 ## License
 

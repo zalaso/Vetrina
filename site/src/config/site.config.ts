@@ -55,7 +55,7 @@ export interface SiteConfig {
   /**
    * Il marchio disegnato dal sito: un monogramma grande in serif con una
    * parola spaziata sotto. Di norma si ricava dal nome dell'attività
-   * ("Bottega del Ponte" → "HD" sopra, "Design" sotto); si può forzare con
+   * ("Bottega del Ponte" → "Bottega" sopra, "del Ponte" sotto); si può forzare con
    * SHOP_LOGO_MONOGRAM e SHOP_LOGO_WORD.
    */
   logo: {
