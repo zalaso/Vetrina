@@ -19,11 +19,16 @@ Setup guide: [English](docs/SETUP.md) · [Italiano](docs/GUIDA.md).
 
 ## Screenshots
 
-<!-- Immagini attese in docs/img/: home.png, item.png, telegram.png -->
+*Not in the repository yet — see [docs/img/README.md](docs/img/README.md)
+for what goes here and how to capture it.*
+
+<!-- Quando le tre immagini sono in docs/img/, sostituisci la riga
+     qui sopra con questa tabella. Vedi docs/img/README.md.
 
 | The shop window | An item | Publishing from Telegram |
 | --- | --- | --- |
 | ![Home page of the shop](docs/img/home.png) | ![Page of a single item](docs/img/item.png) | ![Publishing a piece from the Telegram chat](docs/img/telegram.png) |
+-->
 
 ## Why it exists
 

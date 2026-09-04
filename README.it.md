@@ -19,11 +19,16 @@ Guida all'installazione: [inglese](docs/SETUP.md) · [italiano](docs/GUIDA.md).
 
 ## Immagini
 
-<!-- Immagini attese in docs/img/: home.png, item.png, telegram.png -->
+*Non ancora nel repository — in [docs/img/README.md](docs/img/README.md)
+c'è cosa serve e come catturarlo.*
+
+<!-- Quando le tre immagini sono in docs/img/, sostituisci la riga
+     qui sopra con questa tabella. Vedi docs/img/README.md.
 
 | La vetrina | Un pezzo | Pubblicare da Telegram |
 | --- | --- | --- |
 | ![Home del sito](docs/img/home.png) | ![Pagina di un singolo pezzo](docs/img/item.png) | ![Pubblicazione di un pezzo dalla chat Telegram](docs/img/telegram.png) |
+-->
 
 ## Perché esiste
 
