@@ -19,16 +19,14 @@ Guida all'installazione: [inglese](docs/SETUP.md) · [italiano](docs/GUIDA.md).
 
 ## Immagini
 
-*Non ancora nel repository — in [docs/img/README.md](docs/img/README.md)
-c'è cosa serve e come catturarlo.*
+| La vetrina | Un pezzo |
+| --- | --- |
+| ![Home del sito](docs/img/home.png) | ![Pagina di un singolo pezzo](docs/img/item.png) |
 
-<!-- Quando le tre immagini sono in docs/img/, sostituisci la riga
-     qui sopra con questa tabella. Vedi docs/img/README.md.
+**Pubblicare un pezzo, dall'inizio alla fine** — una foto, due parole, e un
+riepilogo da confermare con un bottone.
 
-| La vetrina | Un pezzo | Pubblicare da Telegram |
-| --- | --- | --- |
-| ![Home del sito](docs/img/home.png) | ![Pagina di un singolo pezzo](docs/img/item.png) | ![Pubblicazione di un pezzo dalla chat Telegram](docs/img/telegram.png) |
--->
+![Pubblicazione di un pezzo dalla chat Telegram](docs/img/telegram.png)
 
 ## Perché esiste
 

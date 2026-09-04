@@ -19,16 +19,14 @@ Setup guide: [English](docs/SETUP.md) · [Italiano](docs/GUIDA.md).
 
 ## Screenshots
 
-*Not in the repository yet — see [docs/img/README.md](docs/img/README.md)
-for what goes here and how to capture it.*
+| The shop window | An item |
+| --- | --- |
+| ![Home page of the shop](docs/img/home.png) | ![Page of a single item](docs/img/item.png) |
 
-<!-- Quando le tre immagini sono in docs/img/, sostituisci la riga
-     qui sopra con questa tabella. Vedi docs/img/README.md.
+**Publishing a piece, start to finish** — a photograph, a few words, and a summary
+to confirm with a button.
 
-| The shop window | An item | Publishing from Telegram |
-| --- | --- | --- |
-| ![Home page of the shop](docs/img/home.png) | ![Page of a single item](docs/img/item.png) | ![Publishing a piece from the Telegram chat](docs/img/telegram.png) |
--->
+![Publishing a piece from the Telegram chat](docs/img/telegram.png)
 
 ## Why it exists
 
