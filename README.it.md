@@ -2,7 +2,7 @@
 
 *[English](README.md) · **Italiano***
 
-[![CI](https://github.com/zalaso/Vetrina/actions/workflows/ci.yml/badge.svg)](https://github.com/zalaso/Vetrina/actions/workflows/ci.yml) [![Licenza: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
+[![CI](https://github.com/zalaso/Vetrina/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/zalaso/Vetrina/actions/workflows/ci.yml) [![Licenza: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
 
 **Il problema.** Un negoziante con merce da vendere e nessuna voglia di imparare
 un'interfaccia — e ogni soluzione pronta ne dà una per scontata.

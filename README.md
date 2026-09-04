@@ -2,7 +2,7 @@
 
 ***English** · [Italiano](README.it.md)*
 
-[![CI](https://github.com/zalaso/Vetrina/actions/workflows/ci.yml/badge.svg)](https://github.com/zalaso/Vetrina/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
+[![CI](https://github.com/zalaso/Vetrina/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/zalaso/Vetrina/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
 
 **The problem.** A shopkeeper with stock to sell and no interest in learning an
 interface — and every off-the-shelf answer assumes one.
