@@ -14,12 +14,20 @@ enquiries over WhatsApp.
 **Status.** In production for one shop since July 2026. MIT-licensed and reusable.
 Setup guide: [English](docs/SETUP.md) · [Italiano](docs/GUIDA.md).
 
-## Why it exists
-
 > **The person using it must never see an error, a form, or a decision they did
 > not ask to make.**
 
-That was the constraint, and every rule in the bot follows from it: confirmations
+## Screenshots
+
+<!-- Immagini attese in docs/img/: home.png, item.png, telegram.png -->
+
+| The shop window | An item | Publishing from Telegram |
+| --- | --- | --- |
+| ![Home page of the shop](docs/img/home.png) | ![Page of a single item](docs/img/item.png) | ![Publishing a piece from the Telegram chat](docs/img/telegram.png) |
+
+## Why it exists
+
+Every rule in the bot follows from the constraint above: confirmations
 are buttons rather than typed commands, failures are apologies rather than stack
 traces, and nothing changes the public site without an explicit tap.
 

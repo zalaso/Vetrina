@@ -14,12 +14,20 @@ e pronto a ricevere richieste su WhatsApp.
 **Stato.** In produzione per una bottega da luglio 2026. Licenza MIT, riutilizzabile.
 Guida all'installazione: [inglese](docs/SETUP.md) · [italiano](docs/GUIDA.md).
 
-## Perché esiste
-
 > **Chi lo usa non deve mai vedere un errore, un modulo da compilare o una
 > decisione che non ha chiesto di prendere.**
 
-Era questo il vincolo, e da lì discende ogni regola del bot: le conferme sono
+## Immagini
+
+<!-- Immagini attese in docs/img/: home.png, item.png, telegram.png -->
+
+| La vetrina | Un pezzo | Pubblicare da Telegram |
+| --- | --- | --- |
+| ![Home del sito](docs/img/home.png) | ![Pagina di un singolo pezzo](docs/img/item.png) | ![Pubblicazione di un pezzo dalla chat Telegram](docs/img/telegram.png) |
+
+## Perché esiste
+
+Da quel vincolo discende ogni regola del bot: le conferme sono
 bottoni invece di comandi da scrivere, gli errori sono scuse invece di messaggi
 tecnici, e niente cambia sul sito pubblico senza un tocco esplicito.
 
