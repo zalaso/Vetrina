@@ -1,17 +1,16 @@
 # Vetrina
 
-**A catalogue and shop window for a small shop, run entirely from Telegram.**
+[![CI](https://github.com/zalaso/Vetrina/actions/workflows/ci.yml/badge.svg)](https://github.com/zalaso/Vetrina/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
 
-[![CI](https://github.com/zalaso/Vetrina/actions/workflows/ci.yml/badge.svg)](https://github.com/zalaso/Vetrina/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
+**The problem.** A shopkeeper with stock to sell and no interest in learning an
+interface — and every off-the-shelf answer assumes one.
 
-The shopkeeper photographs a piece, says a few words about it, and taps a button.
-A minute later it is online, described in decent Italian, priced, and ready to be
-enquired about over WhatsApp. No dashboard, no login, no computer.
+**The solution.** The admin surface is a Telegram chat: photograph a piece, say a
+few words, tap a button. A minute later it is online, priced and ready for
+enquiries over WhatsApp.
 
-Setup and operation: **[English](docs/SETUP.md)** · **[Italiano](docs/GUIDA.md)**
-
----
+**Status.** In production for one shop since July 2026. MIT-licensed and reusable.
+Setup guide: [English](docs/SETUP.md) · [Italiano](docs/GUIDA.md).
 
 ## Why it exists
 
