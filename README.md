@@ -13,6 +13,22 @@ Setup and operation: **[English](docs/SETUP.md)** · **[Italiano](docs/GUIDA.md)
 
 ---
 
+## Why it exists
+
+> **The person using it must never see an error, a form, or a decision they did
+> not ask to make.**
+
+That was the constraint, and every rule in the bot follows from it: confirmations
+are buttons rather than typed commands, failures are apologies rather than stack
+traces, and nothing changes the public site without an explicit tap.
+
+It was written for an antique dealer in his seventies who does not use a computer
+and never will. Every off-the-shelf answer — a CMS, an e-commerce back office, a
+marketplace listing form — assumes someone willing to learn an interface. He
+wasn't, and there was no reason he should be. He did, however, already send photos
+and voice messages to his family all day long, so the admin surface is a Telegram
+chat and everything else is arranged behind it.
+
 ## Who it is for
 
 Shops whose owner will not use a back office, and shouldn't have to: antique
@@ -22,22 +38,6 @@ checkout.
 
 Clone it and run `npm run dev`: you get a complete example shop, with a sample
 catalogue, before connecting anything.
-
-## Why it exists
-
-It was written for an antique dealer in his seventies who does not use a computer
-and never will. Every off-the-shelf answer — a CMS, an e-commerce back office, a
-marketplace listing form — assumes someone willing to learn an interface. He wasn't,
-and there was no reason he should be.
-
-He did, however, already send photos and voice messages to his family all day long.
-So the admin interface is a Telegram chat, and everything else is arranged behind it.
-
-The interesting constraint was not the technology. It was that **the person using it
-must never see an error, a form, or a decision they did not ask to make.** Every rule
-in the bot follows from that: confirmations are buttons rather than typed commands,
-failures are apologies rather than stack traces, and nothing changes the public site
-without an explicit tap.
 
 ## How it works
 
